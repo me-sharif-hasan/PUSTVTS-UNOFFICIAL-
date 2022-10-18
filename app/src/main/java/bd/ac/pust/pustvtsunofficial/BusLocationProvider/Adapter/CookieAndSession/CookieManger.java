@@ -1,7 +1,10 @@
 package bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.CookieAndSession;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -81,6 +84,29 @@ public class CookieManger {
         }
     }
 
+    public boolean checkAllCookie(){
+        boolean ans=false;
+        int cnt=0;
+        for(int key:cookies.keySet()){
+            try{
+                String ck=getCookie(key);
+                ans=true;
+                cnt++;
+            }catch (Exception e){
+                return false;
+            }
+        }
+        Log.d("IILOG",String.valueOf(cnt));
+        return ans&&(cnt>=2);
+    }
+
+    public void clearCookies() throws Exception {
+        File f=new File(COOKIE_FILE);
+        FileWriter fw=new FileWriter(f);
+        fw.write("");
+        fw.close();
+        instance=new CookieManger();
+    }
     static CookieManger instance;
 
     public static CookieManger getInstance() throws Exception {

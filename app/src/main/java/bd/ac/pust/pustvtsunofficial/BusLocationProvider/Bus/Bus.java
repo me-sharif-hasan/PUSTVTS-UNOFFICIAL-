@@ -15,7 +15,7 @@ public class Bus {
         this.busId = busId;
         this.busName = busName;
         this.busRoute = busRoute;
-        busTrackerInterface = TrackerFactory.getTracker(TrackerConfig.TRACK_BY_SIMULATION);
+        busTrackerInterface = TrackerFactory.getTracker(Utility.TRACKER_TYPE);
     }
 
     public String whereAreYou() throws Exception {
