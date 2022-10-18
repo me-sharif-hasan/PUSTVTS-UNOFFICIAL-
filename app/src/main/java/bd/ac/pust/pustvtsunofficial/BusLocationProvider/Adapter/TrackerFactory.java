@@ -1,5 +1,7 @@
 package bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter;
 
+import android.util.Log;
+
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.Interfaces.BusTrackerInterface;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.SimulatedTracker.SimulatedTracker;
 

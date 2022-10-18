@@ -1,12 +1,19 @@
 package bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.SimulatedTracker;
 
+import android.util.Log;
+
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.CookieAndSession.CookieManger;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.Interfaces.BusTrackerInterface;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
 
 import javax.net.ssl.SSLSocket;
 import javax.security.auth.login.LoginException;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -15,10 +22,7 @@ import java.util.regex.Pattern;
 public class SimulatedTracker implements BusTrackerInterface {
     SSLSocket sslSocket;
 
-    public SimulatedTracker() throws LoginException, IOException {
-        if (TrackerConfig.PASSWORD == null || TrackerConfig.USERNAME == null) {
-            throw new LoginException("Username or Password is not given. Please set it first in TrackerConfig class.");
-        }
+    public SimulatedTracker() throws IOException {
         sslSocket = TrackerConfig.getSSLSocketForSimulation();
     }
 
@@ -30,7 +34,7 @@ public class SimulatedTracker implements BusTrackerInterface {
             CookieManger.getInstance().getCookie(3);
         } catch (Exception e) {
             System.err.println("Cookies expired, trying re-login");
-            login();
+            login(TrackerConfig.USERNAME,TrackerConfig.PASSWORD);
         }
         String header = TrackerConfig.getSimulatedTrackingHeaders(busId, CookieManger.getInstance().getCookie(2), CookieManger.getInstance().getCookie(3));
         sslSocket.getOutputStream().write(header.getBytes(StandardCharsets.UTF_8));
@@ -42,7 +46,7 @@ public class SimulatedTracker implements BusTrackerInterface {
         return parts[parts.length - 1];
     }
 
-    private void login() throws Exception {
+    public void login(String username,String pass) throws Exception {
         byte[] bf = new byte[10000];
         /* First page loader */
         String firstPageHeader = TrackerConfig.getSimulatedLoginHeaderFirstPage();
@@ -53,12 +57,24 @@ public class SimulatedTracker implements BusTrackerInterface {
         String cookie = getCookie(output).get(0);
         CookieManger.getInstance().setCookie(1, cookie);
         /* Perform login using cookie and session*/
-        String loginHeader = TrackerConfig.getSimalatedLoginHeaderDoLogin(cookie, middleWare);
-        sslSocket.getOutputStream().write(loginHeader.getBytes(StandardCharsets.UTF_8));
-        dataSize = sslSocket.getInputStream().read(bf);
-        output = new String(bf, 0, dataSize);
+        String loginHeader = TrackerConfig.getSimalatedLoginHeaderDoLogin(cookie, middleWare,username,pass);
+        PrintWriter pr=new PrintWriter(sslSocket.getOutputStream());
+        pr.println(loginHeader);
+        pr.flush();
+        Log.d("IIERR","READING");
+        Scanner bfr=new Scanner(sslSocket.getInputStream());
+        output="";
+        while (bfr.hasNextLine()){
+            String data=bfr.nextLine();
+            if(Objects.equals(data, "")) break;
+            output+=data+"\n";
+        }
         List<String> cookieSession = getCookie(output);
         String loginCookie = cookieSession.get(0);
+        String []cookieParts=loginCookie.split(";")[0].split("=");
+        if(cookieParts[0].equals("messages")){
+            throw new LoginException("Username or password is incorrect");
+        }
         String loginSession = cookieSession.get(1);
         CookieManger.getInstance().setCookie(2, loginCookie);
         CookieManger.getInstance().setCookie(3, loginSession);
