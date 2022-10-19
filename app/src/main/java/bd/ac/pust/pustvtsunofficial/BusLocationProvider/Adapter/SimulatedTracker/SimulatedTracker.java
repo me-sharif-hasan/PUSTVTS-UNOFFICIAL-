@@ -24,6 +24,7 @@ public class SimulatedTracker implements BusTrackerInterface {
 
     public SimulatedTracker() throws IOException {
         sslSocket = TrackerConfig.getSSLSocketForSimulation();
+        sslSocket.setKeepAlive(true);
     }
 
     @Override

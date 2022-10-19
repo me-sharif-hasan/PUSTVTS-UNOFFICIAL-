@@ -7,6 +7,7 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     void moveOn(){
         Log.d("IILOG","Moving on");
         try {
-            BusFactory.checkBusCanBeConnected("0351510093645193"); //for connecting purpose.
+            BusFactory.checkBusCanBeConnected(); //for connecting purpose.
         } catch (Exception e) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             if(CookieManger.getInstance().checkAllCookie()){
                 Log.d("IILOG","ALL COOKIES OKAY");
-                Intent i=new Intent(MainActivity.this, BusFinderActivity.class);
+                Intent i=new Intent(MainActivity.this, BusLocatorActivity.class);
                 startActivity(i);
                 finish();
                 return;
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
                         if(userAndPass!=null) {
                             BusFactory.checkUsernamePassword(userAndPass[0], userAndPass[1]);
                             Log.d("IILOG","USING AUTO LOG IN");
-                            Intent i=new Intent(MainActivity.this,BusFinderActivity.class);
+                            Intent i=new Intent(MainActivity.this,BusLocatorActivity.class);
                             startActivity(i);
                             finish();
                         }else{
