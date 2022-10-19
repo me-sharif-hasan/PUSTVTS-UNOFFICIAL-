@@ -23,6 +23,7 @@ public abstract class TrackerConfig {
     private static String loginDir= Config.getInstance().getMainContext().getFilesDir()+"lgin.cr";
 
     public static void updateUserAndPass(String username,String pass) throws Exception{
+        System.out.println("III "+loginDir);
         File f=new File(loginDir);
         if(!f.exists()){
             f.createNewFile();
@@ -91,10 +92,11 @@ public abstract class TrackerConfig {
                 "sec-ch-ua-platform: \"Windows\"\n\n";
     }
 
+
     public static SSLSocket getSSLSocketForSimulation() throws IOException {
         SSLSocketFactory sslSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
         SSLSocket sslSocket = (SSLSocket) sslSocketFactory.createSocket();
-        sslSocket.connect(new InetSocketAddress("pustvts.com", 443), 10000);
+        sslSocket.connect(new InetSocketAddress("pustvts.com", 443), 4000);
         sslSocket.startHandshake();
         return sslSocket;
     }
