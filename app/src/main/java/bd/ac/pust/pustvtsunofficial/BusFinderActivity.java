@@ -33,18 +33,7 @@ public class BusFinderActivity extends FragmentActivity implements OnMapReadyCal
         binding = ActivityBusFinderBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         /* Create Buses*/
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    BusFactory.createBus(0,"0351510093645193","BUS 1 (BOYS)","Ananta Bazar - Shohor - Meril - Campus");
-                    BusFactory.createBus(1,"0351510093643297","BUS 2 (BOYS)","Ananta Bazar - Shohor - Meril - Campus");
-                    BusFactory.createBus(2,"0351510093647488","BUS 3 (BOYS)","Ananta Bazar - Shohor - Meril - Campus");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+
         /*Update Buses*/
         new Thread(new Runnable() {
             int i=0;
@@ -60,8 +49,8 @@ public class BusFinderActivity extends FragmentActivity implements OnMapReadyCal
                             public void run() {
                                 try {
                                     Log.d("IITRACK","GETTING "+k);
-                                    String busCurrentLocation = BusFactory.whereAreThisBus(k);
-                                    Log.d("IIPOS",busCurrentLocation);
+                                    //String busCurrentLocation = BusFactory.whereAreThisBus(k);
+                                   // Log.d("IIPOS",busCurrentLocation);
                                 } catch (Exception e) {
                                    // e.printStackTrace();
                                 }

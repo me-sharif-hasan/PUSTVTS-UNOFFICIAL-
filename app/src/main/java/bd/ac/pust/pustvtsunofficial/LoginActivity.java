@@ -70,7 +70,7 @@ public class LoginActivity extends AppCompatActivity {
                                 public void run() {
                                     error.setTextColor(Color.GREEN);
                                     error.setText("Login successful");
-                                    Intent i=new Intent(LoginActivity.this,BusFinderActivity.class);
+                                    Intent i=new Intent(LoginActivity.this,BusLocatorActivity.class);
                                     startActivity(i);
                                     finish();
                                 }
