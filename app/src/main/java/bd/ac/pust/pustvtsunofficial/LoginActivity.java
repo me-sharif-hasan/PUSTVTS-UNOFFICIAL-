@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.CookieAndSession.CookieManger;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
+import bd.ac.pust.pustvtsunofficial.Helper.LocationPermissionChecker;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -35,6 +36,10 @@ public class LoginActivity extends AppCompatActivity {
         error=findViewById(R.id.message);
         logo=findViewById(R.id.imageView2);
         progressBar=findViewById(R.id.login_load);
+
+        LocationPermissionChecker locationPermissionChecker=new LocationPermissionChecker(this);
+        locationPermissionChecker.checkPermission();
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
