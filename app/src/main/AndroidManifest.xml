@@ -17,10 +17,9 @@
         tools:targetApi="31">
 
         <activity
-            android:name=".BusFinderActivity"
+            android:name=".BusLocatorActivity"
             android:exported="false"
             android:label="@string/title_activity_bus_finder" />
-
         <activity
             android:name=".LoginActivity"
             android:exported="false">
@@ -41,6 +40,7 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="***REMOVED***" />
