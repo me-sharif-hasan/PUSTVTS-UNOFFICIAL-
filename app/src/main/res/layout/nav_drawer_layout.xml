@@ -14,17 +14,17 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select option what you wants"
         android:gravity="center"
         android:padding="8dp"
-        android:textSize="16dp"
-        android:textColor="@color/black"/>
+        android:text="PUST BUS TRACKER"
+        android:textColor="@color/black"
+        android:textSize="16dp" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:background="@color/teal_700"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:background="@color/teal_700" />
 
     <LinearLayout
         android:id="@+id/ll_nav_vehicles"
@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:orientation="horizontal"
-        android:background="@drawable/four_side_round_light_color_background"
+        android:background="#00FFFFFF"
         android:gravity="center_vertical">
 
         <ImageView
@@ -40,25 +40,26 @@
             android:layout_height="40dp"
             android:src="@drawable/bus_icon"/>
 
-        <TextView
+        <Spinner
+            android:id="@+id/bus_selector"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Vehicles"
-            android:textColor="@color/black"
-            android:textSize="16dp"
-            android:textStyle="bold"
-            android:padding="8dp"/>
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
 
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/gray" />
     <LinearLayout
         android:id="@+id/ll_nav_stoppages"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:orientation="horizontal"
-        android:background="@drawable/four_side_round_light_color_background"
+        android:background="#00FFFFFF"
         android:gravity="center_vertical">
 
         <ImageView
@@ -66,25 +67,26 @@
             android:layout_height="40dp"
             android:src="@drawable/ic_stopage"/>
 
-        <TextView
+        <Spinner
+            android:id="@+id/stopage_selector"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Stoppages"
-            android:textColor="@color/black"
-            android:textSize="16dp"
-            android:textStyle="bold"
-            android:padding="8dp"/>
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
 
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/gray" />
     <LinearLayout
         android:id="@+id/ll_nav_add_alarm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:orientation="horizontal"
-        android:background="@drawable/four_side_round_light_color_background"
+        android:background="?attr/selectableItemBackground"
         android:gravity="center_vertical">
 
         <ImageView
@@ -96,11 +98,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:padding="8dp"
             android:text="Add Alarm"
             android:textColor="@color/black"
             android:textSize="16dp"
-            android:textStyle="bold"
-            android:padding="8dp"/>
+            android:textStyle="normal" />
         <ImageView
             android:id="@+id/iv_nav_clock_bell"
             android:visibility="visible"
@@ -111,56 +113,73 @@
 
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/gray" />
+
     <LinearLayout
         android:id="@+id/ll_nav_help"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:orientation="horizontal"
-        android:background="@drawable/four_side_round_light_color_background"
-        android:gravity="center_vertical">
+        android:background="@color/transparent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/ic_help"/>
+            android:src="@drawable/ic_help" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:padding="8dp"
             android:text="Help"
             android:textColor="@color/black"
             android:textSize="16dp"
-            android:textStyle="bold"
-            android:padding="8dp"/>
+            android:textStyle="normal" />
 
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/gray" />
 
     <LinearLayout
         android:id="@+id/ll_nav_logout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:orientation="horizontal"
-        android:background="@drawable/four_side_round_light_color_background"
-        android:gravity="center_vertical">
+        android:background="@color/transparent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/ic_logout"/>
+            android:src="@drawable/ic_logout" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:padding="8dp"
             android:text="Log Out"
             android:textColor="@color/black"
             android:textSize="16dp"
-            android:textStyle="bold"
-            android:padding="8dp"/>
+            android:textStyle="normal" />
 
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/gray" />
 </LinearLayout>
