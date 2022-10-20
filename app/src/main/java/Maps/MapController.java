@@ -33,7 +33,7 @@ import bd.ac.pust.pustvtsunofficial.R;
 public class MapController implements OnMapReadyCallback {
     Map<String, MarkerOptions> markers=new HashMap<>();
     Map<String,Boolean> updateState=new HashMap<>();
-    double ZOOM_LEVEL=19;
+    double ZOOM_LEVEL=17;
     boolean willZoom=true;
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -63,15 +63,16 @@ public class MapController implements OnMapReadyCallback {
             }
             if(buses!=null) {
                 for (Bus bus : buses) {
+                    Bus copyBus=bus;
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             try {
-                                String busId=bus.getBusId();
+                                String busId=copyBus.getBusId();
                                 if(updateState.containsKey(busId)&& Boolean.TRUE.equals(updateState.get(busId))) return;
-                                bus.whereAreYou();
-                                double lon=bus.getBusLon();
-                                double lat=bus.getBusLat();
+                                copyBus.whereAreYou();
+                                double lon=copyBus.getBusLon();
+                                double lat=copyBus.getBusLat();
                                 if(markers.containsKey(busId)){
                                     markers.get(busId).position(new LatLng(lon,lat));
                                     Log.i("II_MESSAGE","MARKER UPDATED FOR BUS: "+bus.getBusName());
@@ -79,14 +80,14 @@ public class MapController implements OnMapReadyCallback {
                                     //create new marker
                                     MarkerOptions markerOptions=createNewMarker(lon,lat);
                                     Bitmap icon;
-                                    if(bus.getEngineStatus()){
+                                    if( copyBus.getEngineStatus()){
                                         icon=BitmapFactory.decodeResource(Config.getInstance().getMainContext().getResources(),R.mipmap.bus_marker_start);
                                     }else {
                                         icon = BitmapFactory.decodeResource(Config.getInstance().getMainContext().getResources(), R.mipmap.bus_marker);
                                     }
                                     Log.d("SHARIF","HELLO");
                                     markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
-                                    markerOptions.title(bus.getBusName());
+                                    markerOptions.title(copyBus.getBusName());
                                     Config.getInstance().getMainContext().runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {

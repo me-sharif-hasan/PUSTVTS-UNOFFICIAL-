@@ -10,6 +10,7 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +19,18 @@ import android.widget.FrameLayout;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
 
-public class BusLocatorActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
+public class BusLocatorActivity extends AppCompatActivity {
+class BusInfo{
+    public String busName,busRoute,busId;
+    BusInfo(String id,String name,String route){
+        busId=id;
+        busName=name;
+        busRoute=route;
+    }
+}
     FrameLayout bus_finder;
     @SuppressLint("MissingInflatedId")
     @Override
@@ -29,15 +40,36 @@ public class BusLocatorActivity extends AppCompatActivity {
         bus_finder = findViewById(R.id.fl_fragmentHolder);
         FragmentTransaction manager = getSupportFragmentManager().beginTransaction();
         manager.replace(bus_finder.getId(),new MapInflation()).commit();
+
+        ArrayList <BusInfo> buses=new ArrayList<>();
+        buses.add(new BusInfo("0351510093645193","BUS 1 (BOYS)","Ananta Bazar - Shohor - Meril - Campus"));
+        buses.add(new BusInfo("0351510093643297","BUS 2 (BOYS)","Ananta Bazar - Shohor - Meril - Campus"));
+        buses.add(new BusInfo("0351510093647488","BUS 3 (BOYS)","Ananta Bazar - Shohor - Meril - Campus"));
         new Thread(new Runnable() {
+            int i=0;
             @Override
             public void run() {
-                try {
-                    BusFactory.createBus(0,"0351510093645193","BUS 1 (BOYS)","Ananta Bazar - Shohor - Meril - Campus");
-                    BusFactory.createBus(1,"0351510093643297","BUS 2 (BOYS)","Ananta Bazar - Shohor - Meril - Campus");
-                    BusFactory.createBus(2,"0351510093647488","BUS 3 (BOYS)","Ananta Bazar - Shohor - Meril - Campus");
-                } catch (Exception e) {
-                    e.printStackTrace();
+                for(i=0;i<buses.size();i++){
+                    new Thread(new Runnable() {
+                        int j=i;//copy
+                        @Override
+                        public void run() {
+                            while (true) {
+                                try {
+                                    BusFactory.createBus(j, buses.get(j).busId, buses.get(j).busName, buses.get(j).busRoute);
+                                    break;
+                                } catch (Exception e) {
+                                    Log.e("II_ERROR","ADDING BUS FAILURE, RETRYING IN 5 SECOND ");
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    TimeUnit.MILLISECONDS.sleep(5000);
+                                }catch (Exception e){
+
+                                }
+                            }
+                        }
+                    }).start();
                 }
             }
         }).start();

@@ -29,22 +29,28 @@ public class SimulatedTracker implements BusTrackerInterface {
 
     @Override
     public String getTrackingInformation(String busId) throws Exception {
-        if (!sslSocket.isConnected()) sslSocket = TrackerConfig.getSSLSocketForSimulation();
         try {
-            CookieManger.getInstance().getCookie(2);
-            CookieManger.getInstance().getCookie(3);
-        } catch (Exception e) {
-            System.err.println("Cookies expired, trying re-login");
-            login(TrackerConfig.USERNAME,TrackerConfig.PASSWORD);
+            if (!sslSocket.isConnected()|| sslSocket.isClosed()||!sslSocket.isBound()) sslSocket = TrackerConfig.getSSLSocketForSimulation();
+            try {
+                CookieManger.getInstance().getCookie(2);
+                CookieManger.getInstance().getCookie(3);
+            } catch (Exception e) {
+                System.err.println("Cookies expired, trying re-login");
+                login(TrackerConfig.USERNAME, TrackerConfig.PASSWORD);
+            }
+            String header = TrackerConfig.getSimulatedTrackingHeaders(busId, CookieManger.getInstance().getCookie(2), CookieManger.getInstance().getCookie(3));
+            sslSocket.getOutputStream().write(header.getBytes(StandardCharsets.UTF_8));
+            byte[] bf = new byte[10000];
+            int dataSize = sslSocket.getInputStream().read(bf);
+            String[] parts = new String(bf, 0, dataSize).split("\n");
+            if (parts[parts.length - 1] == null || Objects.equals(parts[parts.length - 1], ""))
+                throw new Exception("DATA NOT RECEIVED FROM SERVER");
+            return parts[parts.length - 1];
+        }catch (Exception e){
+            sslSocket=TrackerConfig.getSSLSocketForSimulation();
+            e.printStackTrace();
+            throw e;
         }
-        String header = TrackerConfig.getSimulatedTrackingHeaders(busId, CookieManger.getInstance().getCookie(2), CookieManger.getInstance().getCookie(3));
-        sslSocket.getOutputStream().write(header.getBytes(StandardCharsets.UTF_8));
-        byte[] bf = new byte[10000];
-        int dataSize = sslSocket.getInputStream().read(bf);
-        String[] parts = new String(bf, 0, dataSize).split("\n");
-        if (parts[parts.length - 1] == null || Objects.equals(parts[parts.length - 1], ""))
-            throw new Exception("DATA NOT RECEIVED FROM SERVER");
-        return parts[parts.length - 1];
     }
 
     public void login(String username,String pass) throws Exception {
