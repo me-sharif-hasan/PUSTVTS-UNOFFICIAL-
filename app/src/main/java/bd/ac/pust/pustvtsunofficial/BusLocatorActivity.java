@@ -9,6 +9,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInfo;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -16,9 +18,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,14 +37,6 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class BusLocatorActivity extends AppCompatActivity {
-class BusInfo{
-    public String busName,busRoute,busId;
-    BusInfo(String id,String name,String route){
-        busId=id;
-        busName=name;
-        busRoute=route;
-    }
-}
     FrameLayout bus_finder;
     ImageView dashboard;
     DrawerLayout drawerLayout;
@@ -46,6 +46,7 @@ class BusInfo{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mpc.setContext(this);
         setContentView(R.layout.activity_bus_locator);
         bus_finder = findViewById(R.id.fl_fragmentHolder);
         dashboard = findViewById(R.id.iv_dashboard);
@@ -56,6 +57,34 @@ class BusInfo{
         help = findViewById(R.id.ll_nav_help);
         logout = findViewById(R.id.ll_nav_logout);
 
+
+        Switch isolator=findViewById(R.id.bus_solo_view);
+        isolator.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mpc.isolateView(isolator);
+            }
+        });
+
+        Spinner bus_selector=findViewById(R.id.bus_selector);
+        ArrayAdapter<String> busSelectorAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, android.R.id.text1);
+        busSelectorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        bus_selector.setAdapter(busSelectorAdapter);
+
+        bus_selector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                mpc.selectBusId(i,BusLocatorActivity.this);
+                closeDrawer(drawerLayout);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+
         dashboard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -63,38 +92,46 @@ class BusInfo{
             }
         });
 
-        vehicles.setOnClickListener(new View.OnClickListener() {
+        ImageButton recenter=findViewById(R.id.recenter);
+        recenter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(BusLocatorActivity.this,"You clicked on Vehicles.",
-                        Toast.LENGTH_LONG).show();
-                closeDrawer(drawerLayout);
+                mpc.refocus(BusLocatorActivity.this);
             }
         });
-        stoppages.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(BusLocatorActivity.this,"You clicked on Stoppages.",
-                        Toast.LENGTH_LONG).show();
-                closeDrawer(drawerLayout);
-            }
-        });
-        add_alearm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(BusLocatorActivity.this,"You clicked on Add Alarm.",
-                        Toast.LENGTH_LONG).show();
-                closeDrawer(drawerLayout);
-            }
-        });
-        help.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(BusLocatorActivity.this,"You clicked on Help.",
-                        Toast.LENGTH_LONG).show();
-                closeDrawer(drawerLayout);
-            }
-        });
+
+//        vehicles.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(BusLocatorActivity.this,"You clicked on Vehicles.",
+//                        Toast.LENGTH_LONG).show();
+//                closeDrawer(drawerLayout);
+//            }
+//        });
+//        stoppages.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(BusLocatorActivity.this,"You clicked on Stoppages.",
+//                        Toast.LENGTH_LONG).show();
+//                closeDrawer(drawerLayout);
+//            }
+//        });
+//        add_alearm.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(BusLocatorActivity.this,"You clicked on Add Alarm.",
+//                        Toast.LENGTH_LONG).show();
+//                closeDrawer(drawerLayout);
+//            }
+//        });
+//        help.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(BusLocatorActivity.this,"You clicked on Help.",
+//                        Toast.LENGTH_LONG).show();
+//                closeDrawer(drawerLayout);
+//            }
+//        });
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -107,25 +144,25 @@ class BusInfo{
         FragmentTransaction manager = getSupportFragmentManager().beginTransaction();
         manager.replace(bus_finder.getId(),new MapInflation()).commit();
 
-        ArrayList <BusInfo> buses=new ArrayList<>();
-        buses.add(new BusInfo("0351510093645193","BUS 1 (BOYS)","Ananta Bazar - Shohor - Meril - Campus"));
-        buses.add(new BusInfo("0351510093643297","BUS 2 (BOYS)","Ananta Bazar - Shohor - Meril - Campus"));
-        buses.add(new BusInfo("0351510093647488","BUS 3 (BOYS)","Ananta Bazar - Shohor - Meril - Campus"));
+        ArrayList <BusInfo> buses= Config.getInstance().getBusMapper().get("students");
         new Thread(new Runnable() {
             int i=0;
             @Override
             public void run() {
                 for(i=0;i<buses.size();i++){
+                    busSelectorAdapter.add(buses.get(i).busName);
+                    busSelectorAdapter.notifyDataSetChanged();
                     new Thread(new Runnable() {
-                        int j=i;//copy
+                        final int j=i;//copy
                         @Override
                         public void run() {
                             while (true) {
                                 try {
                                     BusFactory.createBus(j, buses.get(j).busId, buses.get(j).busName, buses.get(j).busRoute);
+                                    Log.d("II_WARN","ADDING BUS: "+buses.get(j).busName);
                                     break;
                                 } catch (Exception e) {
-                                    Log.e("II_ERROR","ADDING BUS FAILURE, RETRYING IN 5 SECOND ");
+                                    Log.e("II_ERROR","ADDING BUS "+buses.get(j).busName+" FAILURE, RETRYING IN 5 SECOND ");
                                     e.printStackTrace();
                                 }
                                 try {
@@ -161,6 +198,7 @@ class BusInfo{
         closeDrawer(drawerLayout);
     }
 
+    static MapController mpc=new MapController();
     public static class MapInflation extends Fragment {
 
         @Override
@@ -178,7 +216,6 @@ class BusInfo{
         public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
             SupportMapFragment mapFragment= (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-            MapController mpc=new MapController();
             assert mapFragment != null;
             mapFragment.getMapAsync(mpc);
         }

@@ -10,11 +10,11 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
 
 public class BusFactory {
-    private static List buses = new ArrayList();
+    private static Map<Integer,Bus> buses = new HashMap<>();
 
     public static void createBus(int key, String busId, String busName, String busRoute,boolean willsave) throws Exception {
         Bus newBus = new Bus(busId, busName, busRoute);
-        if(willsave) buses.add(newBus);
+        if(willsave) buses.put(key,newBus);
     }
     public static void createBus(int key, String busId, String busName, String busRoute) throws Exception {
         createBus(key,busId,busName,busRoute,true);
@@ -35,7 +35,7 @@ public class BusFactory {
     public static int getNumberOfBuses(){
         return buses.size();
     }
-    public static List<Bus> getBuses(){
+    public static Map<Integer, Bus> getBuses(){
         return buses;
     }
     public static void checkUsernamePassword(String username,String pass) throws Exception {
