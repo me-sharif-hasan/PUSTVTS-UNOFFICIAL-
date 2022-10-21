@@ -8,9 +8,14 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.Interfaces.BusTrackerInterface;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerFactory;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInfo;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -34,6 +39,8 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class BusLocatorActivity extends AppCompatActivity {
@@ -100,6 +107,36 @@ public class BusLocatorActivity extends AppCompatActivity {
             }
         });
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //while (true){
+                    try{
+                        BusFactory.createBusList(new BusFactory.BusCreatedEvent() {
+                            @Override
+                            public void onBusCreated(String busName,String busId) {
+                                BusLocatorActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        busSelectorAdapter.add(busName);
+                                        busSelectorAdapter.sort(new Comparator<String>() {
+                                            @Override
+                                            public int compare(String s, String t1) {
+                                                return s.compareTo(t1);
+                                            }
+                                        });
+                                        busSelectorAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                            }
+                        });
+
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+           // }
+        }).start();
 //        vehicles.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -132,6 +169,7 @@ public class BusLocatorActivity extends AppCompatActivity {
 //                closeDrawer(drawerLayout);
 //            }
 //        });
+
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -144,38 +182,47 @@ public class BusLocatorActivity extends AppCompatActivity {
         FragmentTransaction manager = getSupportFragmentManager().beginTransaction();
         manager.replace(bus_finder.getId(),new MapInflation()).commit();
 
-        ArrayList <BusInfo> buses= Config.getInstance().getBusMapper().get("students");
-        new Thread(new Runnable() {
-            int i=0;
-            @Override
-            public void run() {
-                for(i=0;i<buses.size();i++){
-                    busSelectorAdapter.add(buses.get(i).busName);
-                    busSelectorAdapter.notifyDataSetChanged();
-                    new Thread(new Runnable() {
-                        final int j=i;//copy
-                        @Override
-                        public void run() {
-                            while (true) {
-                                try {
-                                    BusFactory.createBus(j, buses.get(j).busId, buses.get(j).busName, buses.get(j).busRoute);
-                                    Log.d("II_WARN","ADDING BUS: "+buses.get(j).busName);
-                                    break;
-                                } catch (Exception e) {
-                                    Log.e("II_ERROR","ADDING BUS "+buses.get(j).busName+" FAILURE, RETRYING IN 5 SECOND ");
-                                    e.printStackTrace();
-                                }
-                                try {
-                                    TimeUnit.MILLISECONDS.sleep(5000);
-                                }catch (Exception e){
-
-                                }
-                            }
-                        }
-                    }).start();
-                }
-            }
-        }).start();
+//        try {
+//            new Thread(new Runnable() {
+//                int i=0;
+//                @Override
+//                public void run() {
+//                    try {
+//                        ArrayList <BusInfo> buses = Config.getInstance().getBus();
+//                        for(i=0;i<buses.size();i++){
+//                            busSelectorAdapter.add(buses.get(i).busName);
+//                            busSelectorAdapter.notifyDataSetChanged();
+//                            new Thread(new Runnable() {
+//                                final int j=i;//copy
+//                                @Override
+//                                public void run() {
+//                                    while (true) {
+//                                        try {
+//                                            BusFactory.createBus(j, buses.get(j).busId, buses.get(j).busName, buses.get(j).busRoute);
+//                                            Log.d("II_WARN","ADDING BUS: "+buses.get(j).busName);
+//                                            break;
+//                                        } catch (Exception e) {
+//                                            Log.e("II_ERROR","ADDING BUS "+buses.get(j).busName+" FAILURE, RETRYING IN 5 SECOND ");
+//                                            e.printStackTrace();
+//                                        }
+//                                        try {
+//                                            TimeUnit.MILLISECONDS.sleep(5000);
+//                                        }catch (Exception e){
+//
+//                                        }
+//                                    }
+//                                }
+//                            }).start();
+//                        }
+//
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }).start();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     private void openDrower() {

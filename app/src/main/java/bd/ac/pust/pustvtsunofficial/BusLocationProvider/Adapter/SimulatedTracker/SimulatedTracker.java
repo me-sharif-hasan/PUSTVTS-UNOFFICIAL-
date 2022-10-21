@@ -2,10 +2,18 @@ package bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.SimulatedTracke
 
 import android.util.Log;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.CookieAndSession.CookieManger;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.Interfaces.BusTrackerInterface;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInfo;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocket;
 import javax.security.auth.login.LoginException;
 
@@ -13,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;

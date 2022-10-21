@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInfo;
 import bd.ac.pust.pustvtsunofficial.MainActivity;
 
@@ -42,8 +43,4 @@ public class Config {
         return instance;
     }
     Map<String, ArrayList<BusInfo>> busMapper=new HashMap<>();
-
-    public Map<String, ArrayList<BusInfo>> getBusMapper() {
-        return busMapper;
-    }
 }
