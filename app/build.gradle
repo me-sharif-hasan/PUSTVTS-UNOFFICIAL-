@@ -44,6 +44,7 @@ dependencies {
 
     implementation 'io.github.ParkSangGwon:tedpermission-normal:3.3.0'
     implementation 'com.google.android.gms:play-services-location:17.1.0'
+    implementation 'org.jsoup:jsoup:1.15.3'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

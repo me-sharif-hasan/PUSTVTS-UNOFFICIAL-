@@ -28,10 +28,10 @@ public class Bus {
     public String whereAreYou() throws Exception {
         if(busId.equals("")) throw new Exception("No bus id provided");
         String locationData=busTrackerInterface.getTrackingInformation(busId);
+        Log.d("II_BUS_DEBUG",busId);
         JSONObject jsonObject=new JSONObject(locationData);
         jsonObject.getString("server_resp");
         JSONObject data=new JSONObject(jsonObject.getString("server_resp"));
-        Log.d("BUSDEBUG",locationData);
         double lon=data.getDouble("gps_lon");
         double lat=data.getDouble("gps_lat");
         int hbAcc=data.getInt("hb_acc");

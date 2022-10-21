@@ -81,72 +81,79 @@ public class MapController implements OnMapReadyCallback {
                 nob=BusFactory.getNumberOfBuses();
                 Log.i("II_INFO","NUMBER OF BUS IS UPDATED TO: "+nob);
             }
+            Log.e("II_MAP",String.valueOf(BusFactory.getBuses().size()));
             if(buses!=null) {
-                for (Integer i : buses.keySet()) {
-                    Bus copyBus=buses.get(i);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                String busId=copyBus.getBusId();
-                                if(busId.equals("N/A")||updateState.containsKey(busId)&& Boolean.TRUE.equals(updateState.get(busId))) return;
-                                copyBus.whereAreYou();
-                                double lon=copyBus.getBusLon();
-                                double lat=copyBus.getBusLat();
-                                if(markerOptionsMap.containsKey(busId)){
-                                    markerOptionsMap.get(busId).position(new LatLng(lat,lon));
-                                    Log.i("II_MESSAGE","MARKER UPDATED FOR BUS: "+copyBus.getBusName());
-                                    Config.getInstance().getMainContext().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if(!hide){
-                                                markerMap.get(busId).setVisible(true);
+                final Map <Integer,Bus> copyBuses=buses;
+                try {
+                    for (int i : copyBuses.keySet()) {
+                        Bus copyBus = copyBuses.get(i);
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    String busId = copyBus.getBusId();
+                                    if (busId.equals("N/A") || updateState.containsKey(busId) && Boolean.TRUE.equals(updateState.get(busId)))
+                                        return;
+                                    copyBus.whereAreYou();
+                                    double lon = copyBus.getBusLon();
+                                    double lat = copyBus.getBusLat();
+                                    if (markerOptionsMap.containsKey(busId)) {
+                                        markerOptionsMap.get(busId).position(new LatLng(lat, lon));
+                                        Log.i("II_MESSAGE", "MARKER UPDATED FOR BUS: " + copyBus.getBusName());
+                                        Config.getInstance().getMainContext().runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (!hide) {
+                                                    markerMap.get(busId).setVisible(true);
+                                                }
+                                                Log.w("II_FOCUS", "FOCUSING ON: " + busId + "; " + willAutoFocus + "; " + focusedBus);
+                                                if (willAutoFocus && busId.equals(focusedBus)) {
+                                                    focus(markerOptionsMap.get(busId));
+                                                }
                                             }
-                                            Log.w("II_FOCUS","FOCUSING ON: "+busId+"; "+willAutoFocus+"; "+focusedBus);
-                                            if(willAutoFocus&&busId.equals(focusedBus)){
-                                                focus(markerOptionsMap.get(busId));
-                                            }
+                                        });
+                                    } else {
+                                        //create new marker
+                                        MarkerOptions markerOptions = createNewMarker(lon, lat);
+                                        Bitmap icon;
+                                        if (copyBus.getEngineStatus()) {
+                                            icon = BitmapFactory.decodeResource(Config.getInstance().getMainContext().getResources(), R.mipmap.bus_marker_start);
+                                        } else {
+                                            icon = BitmapFactory.decodeResource(Config.getInstance().getMainContext().getResources(), R.mipmap.bus_marker);
                                         }
-                                    });
-                                }else{
-                                    //create new marker
-                                    MarkerOptions markerOptions=createNewMarker(lon,lat);
-                                    Bitmap icon;
-                                    if( copyBus.getEngineStatus()){
-                                        icon=BitmapFactory.decodeResource(Config.getInstance().getMainContext().getResources(),R.mipmap.bus_marker_start);
-                                    }else {
-                                        icon = BitmapFactory.decodeResource(Config.getInstance().getMainContext().getResources(), R.mipmap.bus_marker);
+                                        Log.d("SHARIF", "HELLO");
+                                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
+                                        markerOptions.title(copyBus.getBusName());
+                                        Config.getInstance().getMainContext().runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                markerMap.put(busId, gmap.addMarker(markerOptions));
+                                                if (hide && !buses.equals(focusedBus)) {
+                                                    markerMap.get(busId).setVisible(false);
+                                                } else {
+                                                    markerMap.get(busId).setVisible(true);
+                                                }
+                                                Log.i("II_INFO", "BUS MARKER ADDED FOR: " + busId);
+                                                if (willZoom) {
+                                                    focus(markerOptions);
+                                                    willZoom = false;
+                                                }
+                                            }
+                                        });
+                                        markerOptionsMap.put(busId, markerOptions);
                                     }
-                                    Log.d("SHARIF","HELLO");
-                                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
-                                    markerOptions.title(copyBus.getBusName());
-                                    Config.getInstance().getMainContext().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            markerMap.put(busId,gmap.addMarker(markerOptions));
-                                            if(hide&&!buses.equals(focusedBus)){
-                                                markerMap.get(busId).setVisible(false);
-                                            }else{
-                                                markerMap.get(busId).setVisible(true);
-                                            }
-                                            Log.i("II_INFO","BUS MARKER ADDED FOR: "+busId);
-                                            if(willZoom) {
-                                                focus(markerOptions);
-                                                willZoom=false;
-                                            }
-                                        }
-                                    });
-                                    markerOptionsMap.put(busId,markerOptions);
+                                    sleep(1000);
+                                    updateState.put(busId, false);
+                                } catch (Exception e) {
+                                    Log.e("II_ERROR", e.getLocalizedMessage());
+                                    e.printStackTrace();
                                 }
-                                sleep(1000);
-                                updateState.put(busId,false);
-                            }catch (Exception e){
-                                Log.e("II_ERROR",e.getLocalizedMessage());
-                                e.printStackTrace();
                             }
-                        }
-                    }).start();
-                    sleep(1000);
+                        }).start();
+                        sleep(1000);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
             }
             sleep(500);
