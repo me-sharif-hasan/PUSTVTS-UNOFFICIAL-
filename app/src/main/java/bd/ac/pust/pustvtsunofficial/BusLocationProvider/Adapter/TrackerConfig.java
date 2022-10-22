@@ -33,6 +33,12 @@ public abstract class TrackerConfig {
         fos.close();
         Log.d("IILOG","CREDENTIAL SAVED");
     }
+    public static void deleteUserAndPass(){
+        File f=new File(loginDir);
+        if(f.exists()){
+            f.delete();
+        }
+    }
     public static String[] getUserAndPass() throws Exception{
         File f=new File(loginDir);
         if(!f.exists()){

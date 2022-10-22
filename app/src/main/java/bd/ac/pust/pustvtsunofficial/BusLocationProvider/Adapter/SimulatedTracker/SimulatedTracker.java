@@ -51,7 +51,9 @@ public class SimulatedTracker implements BusTrackerInterface {
             sslSocket.getOutputStream().write(header.getBytes(StandardCharsets.UTF_8));
             byte[] bf = new byte[10000];
             int dataSize = sslSocket.getInputStream().read(bf);
-            String[] parts = new String(bf, 0, dataSize).split("\n");
+            String p = new String(bf, 0, dataSize);
+            if(p.length()==0) throw new Exception("DATA NOT RECEIVED");
+            String []parts=p.split("\n");
             if (parts[parts.length - 1] == null || Objects.equals(parts[parts.length - 1], ""))
                 throw new Exception("DATA NOT RECEIVED FROM SERVER");
             return parts[parts.length - 1];
