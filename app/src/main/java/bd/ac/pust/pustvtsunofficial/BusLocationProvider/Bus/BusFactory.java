@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,11 +28,23 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
 
 public class BusFactory {
+    public interface BusLoadListener{
+        public void onBusLoaded(Bus bus,int busKey);
+    }
+    private static BusLoadListener bll=null;
+
+    public static void setBusLoadListener(BusLoadListener bll) {
+        BusFactory.bll = bll;
+    }
+
     private static Map<Integer,Bus> buses = new HashMap<>();
 
     public static void createBus(int key, String busId, String busName, String busRoute,boolean willsave) throws Exception {
         Bus newBus = new Bus(busId, busName, busRoute);
-        if(willsave) buses.put(key,newBus);
+        if(willsave)buses.put(key,newBus);
+        if(bll!=null){
+            bll.onBusLoaded(newBus,key);
+        }
     }
     public static void createBus(int key, String busId, String busName, String busRoute) throws Exception {
         createBus(key,busId,busName,busRoute,true);
@@ -66,14 +79,16 @@ public class BusFactory {
         }
         Document doc= Jsoup.parse(b.toString());
         Elements rows=doc.getElementsByTag("tr");
-        Map <String,String> buses = new HashMap<>();
+        if(rows.size()==0){
+            throw new Exception("NO BUS FOUND");
+        }
         createBus(0,"N/A","SHOW ALL");
         bce.onBusCreated("ALL","N/A");
         int i=1;
         for(Element tr:rows){
             Elements column=tr.getElementsByTag("td");
             if(column.size()==0) continue;
-            String busName=column.get(0).text().toString();
+            String busName= column.get(0).text();
             String busLink=column.get(3).getElementsByTag("a").get(0).attr("href").split("/")[2];
             Log.d("II_MAP",busName+" "+busLink);
             //buses.put(busLink,busName);
@@ -81,11 +96,19 @@ public class BusFactory {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        createBus(cpy, busLink, busName);
-                        bce.onBusCreated(busName, busLink);
-                    }catch (Exception e){
-                        e.printStackTrace();
+                    while (true) {
+                        try {
+                            createBus(cpy, busLink, busName);
+                            bce.onBusCreated(busName, busLink);
+                            break;
+                        } catch (Exception e) {
+                            try {
+                                TimeUnit.MILLISECONDS.sleep(1000);
+                            }catch (Exception te){
+
+                            }
+                            e.printStackTrace();
+                        }
                     }
                 }
             }).start();
@@ -99,6 +122,9 @@ public class BusFactory {
         busTrackerInterface.login(username,pass);
     }
     public interface BusCreatedEvent{
-        public void onBusCreated(String busName,String busId);
+        void onBusCreated(String busName, String busId);
+    }
+    public static void reset(){
+        buses=new HashMap<>();
     }
 }

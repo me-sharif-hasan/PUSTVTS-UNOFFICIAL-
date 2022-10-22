@@ -4,6 +4,8 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.util.concurrent.TimeUnit;
+
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.*;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.Interfaces.BusTrackerInterface;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
@@ -17,6 +19,7 @@ public class Bus {
     private double busLat=0;
     boolean busEngineStatus=false;
     BusTrackerInterface busTrackerInterface;
+    private boolean aboard=false;
 
     public Bus(String busId, String busName, String busRoute) throws Exception {
         this.busId = busId;
@@ -73,5 +76,24 @@ public class Bus {
 
     public boolean getEngineStatus(){
         return busEngineStatus;
+    }
+    public void setUpdateInterval(UpdateActionListener e,long interval){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true&&!aboard) {
+                    e.setLocationUpdateInterval(Bus.this);
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(interval);
+                    }catch (Exception e){}
+                }
+            }
+        }).start();
+    }
+    public interface UpdateActionListener{
+        public void setLocationUpdateInterval(Bus context);
+    }
+    public void aboardAllOperation(){
+        aboard=true;
     }
 }

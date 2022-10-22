@@ -55,7 +55,7 @@ public class MapController implements OnMapReadyCallback {
             @Override
             public void run() {
                 try {
-                    startUpdate(googleMap);
+                    startUpdate2(googleMap);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -72,6 +72,79 @@ public class MapController implements OnMapReadyCallback {
         });
     }
     GoogleMap gmap;
+
+    Map <Integer,Bus> busIdList=new HashMap<>();
+
+    public void startUpdate2(GoogleMap gmap){
+        this.gmap=gmap;
+        Bitmap startIcon=BitmapFactory.decodeResource(Config.getInstance().getMainContext().getResources(), R.mipmap.bus_marker_start);
+        Bitmap normalIcon=BitmapFactory.decodeResource(Config.getInstance().getMainContext().getResources(), R.mipmap.bus_marker);
+        BusFactory.setBusLoadListener(new BusFactory.BusLoadListener() {
+            @Override
+            public void onBusLoaded(Bus bus,int busKey) {
+                busIdList.put(busKey,bus);
+                if(bus.getBusId().equals("N/A")) return;
+                bus.setUpdateInterval(new Bus.UpdateActionListener(){
+                    @Override
+                    public void setLocationUpdateInterval(Bus context) {
+                        try {
+                            if(!focusedBus.equals(context.getBusId())&&hide) return;
+                            context.whereAreYou();
+                            float lon = (float) context.getBusLon();
+                            float lat = (float) context.getBusLat();
+                            Log.d("II_ENGINE",context.getEngineStatus()+" for "+context.getBusName());
+                            Bitmap markerIcon;
+                            if(context.getEngineStatus()){
+                                markerIcon =startIcon;
+                            }else{
+                                markerIcon=normalIcon;
+                            }
+                            if(markerMap.containsKey(context.getBusId())){
+                                Config.getInstance().getMainContext().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Marker marker=markerMap.get(context.getBusId());
+                                        marker.setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
+                                        marker.setPosition(new LatLng(lat,lon));
+                                        if(!hide){
+                                            marker.setVisible(true);
+                                        }
+                                        if(willAutoFocus&&context.getBusId().equals(focusedBus)){
+                                            focus(marker.getPosition());
+                                        }
+                                    }
+                                });
+                            }else{
+                                MarkerOptions markerOptions=createNewMarker(lon,lat);
+                                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(markerIcon));
+                                markerOptions.title(context.getBusName());
+                                Config.getInstance().getMainContext().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Marker marker=gmap.addMarker(markerOptions);
+                                        markerMap.put(context.getBusId(),marker);
+                                        markerOptionsMap.put(context.getBusId(),markerOptions);
+                                        if(hide&&!focusedBus.equals(context.getBusId())){
+                                            marker.setVisible(false);
+                                        }else{
+                                            marker.setVisible(true);
+                                        }
+                                        if(willZoom){
+                                            focus(marker.getPosition());
+                                            willZoom=false;
+                                        }
+                                    }
+                                });
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                },1000);
+            }
+        });
+    }
+
     private void startUpdate(GoogleMap gmap) throws Exception {
         this.gmap=gmap;
         int nob=0;
@@ -82,11 +155,13 @@ public class MapController implements OnMapReadyCallback {
                 Log.i("II_INFO","NUMBER OF BUS IS UPDATED TO: "+nob);
             }
             Log.e("II_MAP",String.valueOf(BusFactory.getBuses().size()));
+
             if(buses!=null) {
                 final Map <Integer,Bus> copyBuses=buses;
                 try {
                     for (int i : copyBuses.keySet()) {
                         Bus copyBus = copyBuses.get(i);
+
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -98,18 +173,31 @@ public class MapController implements OnMapReadyCallback {
                                     double lon = copyBus.getBusLon();
                                     double lat = copyBus.getBusLat();
                                     if (markerOptionsMap.containsKey(busId)) {
-                                        markerOptionsMap.get(busId).position(new LatLng(lat, lon));
-                                        Log.i("II_MESSAGE", "MARKER UPDATED FOR BUS: " + copyBus.getBusName());
                                         Config.getInstance().getMainContext().runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
+                                                Log.i("II_MESSAGE", "MARKER UPDATED FOR BUS: " + copyBus.getBusName());
+                                                //markerOptionsMap.get(busId).position(new LatLng(lat, lon));
+                                                markerMap.get(busId).setPosition(new LatLng(lat,lon));
+
+                                                Bitmap icon;
+                                                if (copyBus.getEngineStatus()) {
+                                                    icon = BitmapFactory.decodeResource(Config.getInstance().getMainContext().getResources(), R.mipmap.bus_marker_start);
+                                                } else {
+                                                    icon = BitmapFactory.decodeResource(Config.getInstance().getMainContext().getResources(), R.mipmap.bus_marker);
+                                                }
+                                                Log.d("SHARIF", "HELLO "+copyBus.getEngineStatus());
+                                                markerOptionsMap.get(busId).icon(BitmapDescriptorFactory.fromBitmap(icon));
+
+
                                                 if (!hide) {
                                                     markerMap.get(busId).setVisible(true);
                                                 }
                                                 Log.w("II_FOCUS", "FOCUSING ON: " + busId + "; " + willAutoFocus + "; " + focusedBus);
                                                 if (willAutoFocus && busId.equals(focusedBus)) {
-                                                    focus(markerOptionsMap.get(busId));
+                                                    focus(markerMap.get(busId).getPosition());
                                                 }
+
                                             }
                                         });
                                     } else {
@@ -135,7 +223,7 @@ public class MapController implements OnMapReadyCallback {
                                                 }
                                                 Log.i("II_INFO", "BUS MARKER ADDED FOR: " + busId);
                                                 if (willZoom) {
-                                                    focus(markerOptions);
+                                                    focus(markerMap.get(busId).getPosition());
                                                     willZoom = false;
                                                 }
                                             }
@@ -160,10 +248,9 @@ public class MapController implements OnMapReadyCallback {
         }
     }
 
-    private void focus(MarkerOptions markerOptions){
-        LatLng latLng=markerOptions.getPosition();
-        Log.i("II_INFO",latLng.latitude+" "+latLng.longitude);
-        gmap.animateCamera(CameraUpdateFactory.newLatLngZoom(markerOptions.getPosition(), (float) (willZoom==true?ZOOM_LEVEL:gmap.getCameraPosition().zoom)));
+    private void focus(LatLng latLng){
+        if(gmap==null||context==null) return;
+        gmap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, (float) (willZoom==true?ZOOM_LEVEL:gmap.getCameraPosition().zoom)));
         context.findViewById(R.id.recenter).setVisibility(View.INVISIBLE);
     }
     private MarkerOptions createNewMarker(double lon,double lat){
@@ -181,34 +268,34 @@ public class MapController implements OnMapReadyCallback {
     }
 
     public void selectBusId(int i, AppCompatActivity context) {
-        if(buses==null||!buses.containsKey(i)) return;
+        Log.e("II_ERR",String.valueOf(i)+" "+busIdList.size());
+        if(busIdList==null||!busIdList.containsKey(i)) return;
         TextView tv=context.findViewById(R.id.bus_name_show);
-        tv.setText(Objects.requireNonNull(buses.get(i)).getBusName());
         @SuppressLint("UseSwitchCompatOrMaterialCode") Switch soloView=context.findViewById(R.id.bus_solo_view);
-        String busId=buses.get(i).getBusId();
+        String busId= Objects.requireNonNull(busIdList.get(i)).getBusId();
         if(busId.equals("N/A")){
             willAutoFocus=false;
             focusedBus="";
-            tv.setText("");
+            tv.setText("Showing All");
             soloView.setChecked(false);
             isolateView(soloView);
             soloView.setVisibility(View.INVISIBLE);
             return;
         }
         Log.i("II_CHECK","BUS SELECTED "+i+" "+busId);
-        if(!markerOptionsMap.containsKey(busId)){
+        if(!markerMap.containsKey(busId)){
             Toast.makeText(context, "This bus is not loaded yet!", Toast.LENGTH_SHORT).show();
+            return;
         }
+        tv.setText(Objects.requireNonNull(busIdList.get(i)).getBusName());
         //Ignore focus flag
-        MarkerOptions markerOptions= markerOptionsMap.get(busId);
-        if(markerOptions==null) return;
-        markerMap.get(busId).setVisible(true);
+        Objects.requireNonNull(markerMap.get(busId)).setVisible(true);
         focusedBus=busId;
         willAutoFocus=true;
         soloView.setVisibility(View.VISIBLE);
         soloView.setChecked(true);
         isolateView(soloView);
-        focus(markerOptions);
+        focus(Objects.requireNonNull(markerMap.get(busId)).getPosition());
     }
     public void isolateView(Switch sw){
         Log.d("II_SWITCH", String.valueOf(sw.isChecked()));
@@ -233,9 +320,22 @@ public class MapController implements OnMapReadyCallback {
             context.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    focus(markerOptionsMap.get(focusedBus));
+                    focus(markerMap.get(focusedBus).getPosition());
                 }
             });
         }
+    }
+
+    public void reset() {
+        markerOptionsMap =new HashMap<>();
+        markerMap=new HashMap<>();
+        updateState=new HashMap<>();
+        buses=null;
+        ZOOM_LEVEL=19;
+        willZoom=true;
+        willAutoFocus=false;
+        focusedBus="";
+        hide=false;
+        context=null;
     }
 }

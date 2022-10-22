@@ -8,6 +8,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.CookieAndSession.CookieManger;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.Interfaces.BusTrackerInterface;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerFactory;
@@ -18,6 +19,7 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -110,7 +112,7 @@ public class BusLocatorActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                //while (true){
+                while (true){
                     try{
                         BusFactory.createBusList(new BusFactory.BusCreatedEvent() {
                             @Override
@@ -130,12 +132,17 @@ public class BusLocatorActivity extends AppCompatActivity {
                                 });
                             }
                         });
-
+                        break;
                     }catch (Exception e){
+                        try {
+                            TimeUnit.MILLISECONDS.sleep(1000);
+                        }catch (Exception te){
+
+                        }
                         e.printStackTrace();
                     }
                 }
-           // }
+            }
         }).start();
 //        vehicles.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -173,8 +180,17 @@ public class BusLocatorActivity extends AppCompatActivity {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(BusLocatorActivity.this,"You clicked on Log Out.",
-                        Toast.LENGTH_LONG).show();
+                try {
+                    CookieManger.getInstance().clearCookies();
+                    TrackerConfig.deleteUserAndPass();
+                    Toast.makeText(BusLocatorActivity.this,"Logout successful",
+                            Toast.LENGTH_LONG).show();
+                    finishAffinity();
+                    System.exit(0);
+                } catch (Exception e) {
+                    Toast.makeText(BusLocatorActivity.this,"Logout unsuccessful",
+                            Toast.LENGTH_LONG).show();
+                }
                 closeDrawer(drawerLayout);
             }
         });
