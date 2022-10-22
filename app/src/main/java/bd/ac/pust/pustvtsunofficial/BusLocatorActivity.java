@@ -17,6 +17,7 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInfo;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
+import bd.ac.pust.pustvtsunofficial.Helper.VehiclesInfoBottomSheet;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -51,6 +52,8 @@ public class BusLocatorActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     LinearLayout vehicles,stoppages,add_alearm,help,logout;
 
+    TextView bottomShow,stopedInfo;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,29 @@ public class BusLocatorActivity extends AppCompatActivity {
         help = findViewById(R.id.ll_nav_help);
         logout = findViewById(R.id.ll_nav_logout);
 
+        bottomShow = findViewById(R.id.bus_name_show);
+        stopedInfo = findViewById(R.id.stopage_name);
+
+        bottomShow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                VehiclesInfoBottomSheet bottomSheet = new VehiclesInfoBottomSheet("Bus1",
+                        "Female Students",
+                        "Tarminal -> Ananto -> Sahar","8:30 AM");
+                bottomSheet.show(getSupportFragmentManager(),bottomSheet.getTag());
+            }
+        });
+
+        stopedInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                VehiclesInfoBottomSheet bottomSheet = new VehiclesInfoBottomSheet("Bus1",
+                        "Female Students",
+                        "Tarminal -> Meril -> Gasspara","18 seconds ago.",
+                        "Meril","5 minute ago");
+                bottomSheet.show(getSupportFragmentManager(),bottomSheet.getTag());
+            }
+        });
 
         Switch isolator=findViewById(R.id.bus_solo_view);
         isolator.setOnClickListener(new View.OnClickListener() {
