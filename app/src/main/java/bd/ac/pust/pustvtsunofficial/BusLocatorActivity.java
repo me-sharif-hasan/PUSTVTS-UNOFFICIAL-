@@ -1,6 +1,5 @@
 package bd.ac.pust.pustvtsunofficial;
 
-import Maps.MapController;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +17,7 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInfo;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
 import bd.ac.pust.pustvtsunofficial.Helper.VehiclesInfoBottomSheet;
+import bd.ac.pust.pustvtsunofficial.Maps.MapController;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
