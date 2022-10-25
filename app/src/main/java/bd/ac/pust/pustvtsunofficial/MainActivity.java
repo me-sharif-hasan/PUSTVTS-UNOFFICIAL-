@@ -6,6 +6,7 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInformationFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
 
@@ -21,15 +22,23 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends AppCompatActivity {
     Button retry;
@@ -42,6 +51,10 @@ public class MainActivity extends AppCompatActivity {
         Config.getInstance().setMainContext(this);
         retry=findViewById(R.id.retry);
         pb=findViewById(R.id.progressBar);
+
+        BusInformationFactory.initiate();
+
+
         //Creating buses
         retry.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,8 +81,11 @@ public class MainActivity extends AppCompatActivity {
     void moveOn(){
         Log.d("IILOG","Moving on");
         try {
+            Log.d("II_CON","CHECKING");
             BusFactory.checkBusCanBeConnected(); //for connecting purpose.
+            Log.d("II_CON","CONNECTION OK");
         } catch (Exception e) {
+            Log.d("II_CON","CAN'T BE CONNECTED");
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

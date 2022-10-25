@@ -2,8 +2,20 @@ package bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus;
 
 import android.util.Log;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.*;
@@ -26,6 +38,44 @@ public class Bus {
         this.busName = busName;
         this.busRoute = busRoute;
         busTrackerInterface = TrackerFactory.getTracker(Utility.TRACKER_TYPE);
+    }
+
+    public String getBusType() throws Exception {
+        BusInformationFactory bif=BusInformationFactory.initiate();
+        JSONObject jsonObject=bif.getBusInfo(busId);
+        JSONObject time=jsonObject.getJSONObject("time");
+
+        Map<Date,JSONObject> bst=new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm a");
+        ArrayList <Date> arrayList=new ArrayList();
+        for (Iterator<String> it = time.keys(); it.hasNext(); ) {
+            String t = it.next();
+            Date d1 = sdf.parse(t);
+            arrayList.add(d1);
+            bst.put(d1,time.getJSONObject(t));
+            Log.d("II_TIME",t);
+        }
+        Date currentTime=sdf.parse(/*sdf.format(new Date())*/"11:00 AM");
+        Collections.sort(arrayList);
+        int l=0,r=1;
+        if(currentTime.compareTo(arrayList.get(0))<=0||currentTime.compareTo(arrayList.get(arrayList.size()-1))>0){
+            l=arrayList.size()-1; //if engine on
+            r=0; //if engine off
+        }
+        else{
+            while (r<arrayList.size()){
+                if(arrayList.get(l).compareTo(currentTime)>=0&&arrayList.get(r).compareTo(currentTime)<=0) {
+                    break;
+                }else {
+                    l++;r++;
+                }
+            }
+        }
+        if(getEngineStatus()){
+            return time.getString(sdf.format(arrayList.get(l)));
+        }else{
+            return time.getString(sdf.format(arrayList.get(r)));
+        }
     }
 
     public String whereAreYou() throws Exception {

@@ -52,13 +52,18 @@ public class MapController implements OnMapReadyCallback {
     public void setContext(AppCompatActivity context) {
         this.context = context;
     }
-
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(@NonNull Marker marker) {
                 Bus bus= (Bus) marker.getTag();
+                try {
+                    Log.d("II_BUS_TYPE",bus.getBusType());
+                }catch (Exception e){
+                    Log.e("II_ERROR","BUS INFORMATION NOT LOADED");
+                    e.printStackTrace();
+                }
                 VehiclesInfoBottomSheet bottomSheet = new VehiclesInfoBottomSheet(bus.getBusName(),
                         "Students",
                         "Tarminal -> Ananto -> Sahar","8:30 AM");
