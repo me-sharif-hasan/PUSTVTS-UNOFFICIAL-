@@ -2,6 +2,7 @@ package bd.ac.pust.pustvtsunofficial;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -20,6 +21,7 @@ import bd.ac.pust.pustvtsunofficial.Helper.VehiclesInfoBottomSheet;
 import bd.ac.pust.pustvtsunofficial.Maps.MapController;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -206,18 +208,41 @@ public class BusLocatorActivity extends AppCompatActivity {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    CookieManger.getInstance().clearCookies();
-                    TrackerConfig.deleteUserAndPass();
-                    Toast.makeText(BusLocatorActivity.this,"Logout successful",
-                            Toast.LENGTH_LONG).show();
-                    finishAffinity();
-                    System.exit(0);
-                } catch (Exception e) {
-                    Toast.makeText(BusLocatorActivity.this,"Logout unsuccessful",
-                            Toast.LENGTH_LONG).show();
-                }
-                closeDrawer(drawerLayout);
+                new AlertDialog.Builder(BusLocatorActivity.this)
+                        .setIcon(R.drawable.ic_logout)
+                        .setTitle("Log Out")
+                        .setMessage("Are you sure to log out.")
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                try {
+                                    CookieManger.getInstance().clearCookies();
+                                    TrackerConfig.deleteUserAndPass();
+                                    Toast.makeText(BusLocatorActivity.this,"Logout successful",
+                                            Toast.LENGTH_LONG).show();
+                                    finishAffinity();
+                                    System.exit(0);
+                                } catch (Exception e) {
+                                    Toast.makeText(BusLocatorActivity.this,"Logout unsuccessful",
+                                            Toast.LENGTH_LONG).show();
+                                }
+                                closeDrawer(drawerLayout);
+                            }
+                        })
+                        .setNeutralButton("HELP", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(BusLocatorActivity.this, "Click Yes to " +
+                                        "log out.", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        }).show();
+
             }
         });
 
@@ -308,5 +333,33 @@ public class BusLocatorActivity extends AppCompatActivity {
             assert mapFragment != null;
             mapFragment.getMapAsync(mpc);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        new AlertDialog.Builder(BusLocatorActivity.this)
+                .setIcon(R.drawable.ic_logout)
+                .setTitle("Exit")
+                .setMessage("Are you sure to Exit.")
+                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                })
+                .setNeutralButton("HELP", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(BusLocatorActivity.this, "Click Yes to " +
+                                "Exit.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                }).show();
     }
 }
