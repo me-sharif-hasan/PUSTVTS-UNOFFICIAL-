@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -31,6 +32,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.StoppageManager.StoppageManager;
 import bd.ac.pust.pustvtsunofficial.Helper.VehiclesInfoBottomSheet;
 import bd.ac.pust.pustvtsunofficial.R;
 
@@ -54,21 +56,41 @@ public class MapController implements OnMapReadyCallback {
     }
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+        gmap=googleMap;
+        createStoppages();
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(@NonNull Marker marker) {
                 Bus bus= (Bus) marker.getTag();
                 try {
-                    Log.d("II_BUS_TYPE",bus.getBusType());
+                    if(!bus.getEngineStatus()) {
+                        VehiclesInfoBottomSheet bottomSheet = new VehiclesInfoBottomSheet(bus.getBusName(), bus.getBusType(), bus.getBusRoute(), bus.getNextStartTime());
+                        bottomSheet.show(context.getSupportFragmentManager(), bottomSheet.getTag());
+                    }else{
+                        VehiclesInfoBottomSheet bottomSheet = new VehiclesInfoBottomSheet(bus.getBusName(), bus.getBusType(), bus.getBusRoute(), "07:08AM","DEGREE","NA");
+                        bottomSheet.show(context.getSupportFragmentManager(), bottomSheet.getTag());
+                    }
                 }catch (Exception e){
                     Log.e("II_ERROR","BUS INFORMATION NOT LOADED");
                     e.printStackTrace();
                 }
-                VehiclesInfoBottomSheet bottomSheet = new VehiclesInfoBottomSheet(bus.getBusName(),
-                        "Students",
-                        "Tarminal -> Ananto -> Sahar","8:30 AM");
-                bottomSheet.show(context.getSupportFragmentManager(),bottomSheet.getTag());
                 return false;
+            }
+        });
+        googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDrag(@NonNull Marker marker) {
+
+            }
+
+            @Override
+            public void onMarkerDragEnd(@NonNull Marker marker) {
+                Log.d("II_DRAG",marker.getPosition().latitude+"\t"+marker.getPosition().longitude);
+            }
+
+            @Override
+            public void onMarkerDragStart(@NonNull Marker marker) {
+
             }
         });
         new Thread(new Runnable() {
@@ -189,8 +211,8 @@ public class MapController implements OnMapReadyCallback {
     }
     private MarkerOptions createNewMarker(double lon,double lat){
         LatLng l=new LatLng(lat,lon);
-        MarkerOptions mop=new MarkerOptions().title("BUS").position(l);
-        mop.anchor(0.5f,0.567f);
+        MarkerOptions mop=new MarkerOptions().position(l);
+        mop.anchor(0.5f,0.56f);
         return mop;
     }
 
@@ -273,5 +295,35 @@ public class MapController implements OnMapReadyCallback {
         focusedBus="";
         hide=false;
         context=null;
+    }
+    Map <String,LatLng> stoppages=new HashMap<>();
+    public void addStop(String name,LatLng l){
+        stoppages.put(name,l);
+    }
+    public void createStoppages(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (StoppageManager.getStoppages()==null) {
+                    try{
+                        TimeUnit.MILLISECONDS.sleep(3000);
+                    }catch (Exception e){}
+                }
+                for(String name:stoppages.keySet()){
+                    LatLng latLng=stoppages.get(name);
+                    MarkerOptions moc=createNewMarker(latLng.longitude,latLng.latitude);
+                    moc.title(name);
+                    Bitmap bitmap=BitmapFactory.decodeResource(context.getResources(),R.mipmap.bus_stop);
+                    moc.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                    //moc.draggable(true);
+                    context.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            gmap.addMarker(moc);
+                        }
+                    });
+                }
+            }
+        }).start();
     }
 }
