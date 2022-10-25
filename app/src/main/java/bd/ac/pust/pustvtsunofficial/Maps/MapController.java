@@ -1,4 +1,4 @@
-package Maps;
+package bd.ac.pust.pustvtsunofficial.Maps;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
