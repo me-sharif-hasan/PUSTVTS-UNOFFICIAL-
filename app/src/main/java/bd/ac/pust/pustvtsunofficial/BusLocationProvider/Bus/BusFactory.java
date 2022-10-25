@@ -43,6 +43,7 @@ public class BusFactory {
         Bus newBus = new Bus(busId, busName, busRoute);
         if(willsave)buses.put(key,newBus);
         if(bll!=null){
+
             bll.onBusLoaded(newBus,key);
         }
     }

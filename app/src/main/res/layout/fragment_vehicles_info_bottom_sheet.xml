@@ -12,7 +12,7 @@
         android:id="@+id/tv_bottom_sheet_vehicle_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="-4dp"
+        android:layout_marginStart="4dp"
         android:paddingBottom="6dp"
         android:text="Vechile Name"
         android:textColor="@color/black"
@@ -26,31 +26,32 @@
         android:id="@+id/tv_bottom_sheet_vehicle_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="6dp"
         android:text="( Female Student )"
         android:textColor="@color/black"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/tv_bottom_sheet_vehicle_name"
-        app:layout_constraintStart_toEndOf="@+id/tv_bottom_sheet_vehicle_name"
-        app:layout_constraintTop_toTopOf="@+id/tv_bottom_sheet_vehicle_name" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_bottom_sheet_vehicle_name"
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/tv_bottom_sheet_road"
-        android:layout_width="0dp"
-        android:layout_height="45dp"
+        android:layout_width="347dp"
+        android:layout_height="43dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="4dp"
         android:background="@drawable/four_side_round"
-        android:backgroundTint="#EFEFEF"
+        android:backgroundTint="#00FFFFFF"
         android:gravity="center_vertical"
-        android:paddingLeft="12dp"
+        android:paddingLeft="0dp"
         android:paddingTop="8dp"
         android:text="Tarminal -> Meril -> Gasspara"
         android:textColor="@color/black"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/imageView3"
         app:layout_constraintTop_toBottomOf="@+id/tv_bottom_sheet_vehicle_name"
         tools:paddingBottom="8dp" />
 
@@ -58,12 +59,36 @@
         android:id="@+id/imageView3"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
         android:padding="4dp"
         android:src="@drawable/bus_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:padding="4dp"
+        android:src="@drawable/route_icon"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_bottom_sheet_road"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:padding="4dp"
+        android:src="@drawable/ic_clock_start"
+        app:layout_constraintBottom_toBottomOf="@+id/cl_while_engg_off"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/cl_while_engg_off"
+        app:layout_constraintVertical_bias="0.0" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_while_engg_off"
@@ -71,9 +96,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:background="@drawable/four_side_round"
-        android:backgroundTint="#EFEFEF"
-        android:padding="12dp"
-        android:visibility="visible"
+        android:backgroundTint="#00FFFFFF"
+        android:padding="0dp"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="@+id/tv_bottom_sheet_road"
         app:layout_constraintStart_toStartOf="@+id/tv_bottom_sheet_road"
         app:layout_constraintTop_toBottomOf="@+id/tv_bottom_sheet_road">
@@ -105,16 +130,13 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_while_engg_on"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/four_side_round"
-        android:backgroundTint="#EFEFEF"
-        android:padding="12dp"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="@+id/tv_bottom_sheet_road"
-        app:layout_constraintStart_toStartOf="@+id/tv_bottom_sheet_road"
-        app:layout_constraintTop_toBottomOf="@+id/tv_bottom_sheet_road">
+        android:layout_width="350dp"
+        android:layout_height="60dp"
+        android:background="#00FFFFFF"
+        android:padding="0dp"
+        android:visibility="visible"
+        tools:layout_editor_absoluteX="59dp"
+        tools:layout_editor_absoluteY="124dp">
 
         <TextView
             android:id="@+id/textView6"
@@ -162,13 +184,5 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tv_bottom_sheet_last_pass_location" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <View
-        android:id="@+id/view"
-        android:layout_width="0dp"
-        android:layout_height="120dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_bottom_sheet_road" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
