@@ -16,6 +16,7 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInfo;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.StoppageManager.StoppageManager;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
 import bd.ac.pust.pustvtsunofficial.Helper.VehiclesInfoBottomSheet;
 import bd.ac.pust.pustvtsunofficial.Maps.MapController;
@@ -42,6 +43,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -74,26 +76,7 @@ public class BusLocatorActivity extends AppCompatActivity {
         bottomShow = findViewById(R.id.bus_name_show);
         stopedInfo = findViewById(R.id.stopage_name);
 
-        bottomShow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                VehiclesInfoBottomSheet bottomSheet = new VehiclesInfoBottomSheet("Bus1",
-                        "Female Students",
-                        "Tarminal -> Ananto -> Sahar","8:30 AM");
-                bottomSheet.show(getSupportFragmentManager(),bottomSheet.getTag());
-            }
-        });
 
-        stopedInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                VehiclesInfoBottomSheet bottomSheet = new VehiclesInfoBottomSheet("Bus1",
-                        "Female Students",
-                        "Tarminal -> Meril -> Gasspara","18 seconds ago.",
-                        "Meril","5 minute ago");
-                bottomSheet.show(getSupportFragmentManager(),bottomSheet.getTag());
-            }
-        });
 
         Switch isolator=findViewById(R.id.bus_solo_view);
         isolator.setOnClickListener(new View.OnClickListener() {
@@ -121,6 +104,32 @@ public class BusLocatorActivity extends AppCompatActivity {
             }
         });
 
+        Spinner stoppage_selector=findViewById(R.id.stoppage_selector);
+        ArrayAdapter<String> stoppageSelectorAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, android.R.id.text1);
+        busSelectorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        stoppage_selector.setAdapter(stoppageSelectorAdapter);
+
+        StoppageManager.setOnStoppageLoadListener(new StoppageManager.StoppageLoadEvent() {
+            @Override
+            public void onStoppageCreated(String stoppageName, LatLng l) {
+                stoppageSelectorAdapter.add(stoppageName);
+                stoppageSelectorAdapter.notifyDataSetChanged();
+                mpc.addStop(stoppageName,l);
+            }
+        });
+        StoppageManager.initiate();
+
+        stoppage_selector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+               // mpc.setStopage
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         dashboard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,39 +181,6 @@ public class BusLocatorActivity extends AppCompatActivity {
                 }
             }
         }).start();
-//        vehicles.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(BusLocatorActivity.this,"You clicked on Vehicles.",
-//                        Toast.LENGTH_LONG).show();
-//                closeDrawer(drawerLayout);
-//            }
-//        });
-//        stoppages.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(BusLocatorActivity.this,"You clicked on Stoppages.",
-//                        Toast.LENGTH_LONG).show();
-//                closeDrawer(drawerLayout);
-//            }
-//        });
-//        add_alearm.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(BusLocatorActivity.this,"You clicked on Add Alarm.",
-//                        Toast.LENGTH_LONG).show();
-//                closeDrawer(drawerLayout);
-//            }
-//        });
-//        help.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(BusLocatorActivity.this,"You clicked on Help.",
-//                        Toast.LENGTH_LONG).show();
-//                closeDrawer(drawerLayout);
-//            }
-//        });
-
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -249,47 +225,6 @@ public class BusLocatorActivity extends AppCompatActivity {
         FragmentTransaction manager = getSupportFragmentManager().beginTransaction();
         manager.replace(bus_finder.getId(),new MapInflation()).commit();
 
-//        try {
-//            new Thread(new Runnable() {
-//                int i=0;
-//                @Override
-//                public void run() {
-//                    try {
-//                        ArrayList <BusInfo> buses = Config.getInstance().getBus();
-//                        for(i=0;i<buses.size();i++){
-//                            busSelectorAdapter.add(buses.get(i).busName);
-//                            busSelectorAdapter.notifyDataSetChanged();
-//                            new Thread(new Runnable() {
-//                                final int j=i;//copy
-//                                @Override
-//                                public void run() {
-//                                    while (true) {
-//                                        try {
-//                                            BusFactory.createBus(j, buses.get(j).busId, buses.get(j).busName, buses.get(j).busRoute);
-//                                            Log.d("II_WARN","ADDING BUS: "+buses.get(j).busName);
-//                                            break;
-//                                        } catch (Exception e) {
-//                                            Log.e("II_ERROR","ADDING BUS "+buses.get(j).busName+" FAILURE, RETRYING IN 5 SECOND ");
-//                                            e.printStackTrace();
-//                                        }
-//                                        try {
-//                                            TimeUnit.MILLISECONDS.sleep(5000);
-//                                        }catch (Exception e){
-//
-//                                        }
-//                                    }
-//                                }
-//                            }).start();
-//                        }
-//
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }).start();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
     }
 
     private void openDrower() {

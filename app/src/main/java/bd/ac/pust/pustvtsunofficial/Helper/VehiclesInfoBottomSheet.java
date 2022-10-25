@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -68,17 +69,20 @@ public class VehiclesInfoBottomSheet extends BottomSheetDialogFragment {
         prevStopagePassTime = view.findViewById(R.id.tv_bottom_sheet_last_pass_time);
         enggOn = view.findViewById(R.id.cl_while_engg_on);
         enggOff = view.findViewById(R.id.cl_while_engg_off);
+        ImageView imgv3=view.findViewById(R.id.imageView3);
 
         vName.setText(vName_value);
         vType.setText("("+vType_value+")");
         road.setText(road_value);
         if(isRunning){
+            imgv3.setImageResource(R.mipmap.bus_marker_start);
             enggOff.setVisibility(View.INVISIBLE);
             enggOn.setVisibility(View.VISIBLE);
             lastupdate.setText(lastUpdate_value);
-            prevStopage.setText(prevStopage_value+" Stopage Passed");
+            prevStopage.setText("Last reported: "+prevStopage_value);
             prevStopagePassTime.setText(prevStopagePassTime_value);
         }else{
+            imgv3.setImageResource(R.mipmap.bus_marker);
             enggOff.setVisibility(View.VISIBLE);
             enggOn.setVisibility(View.INVISIBLE);
             stime.setText(sTime_value);        }

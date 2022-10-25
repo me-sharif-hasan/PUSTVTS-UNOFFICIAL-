@@ -40,13 +40,13 @@ public class Bus {
         busTrackerInterface = TrackerFactory.getTracker(Utility.TRACKER_TYPE);
     }
 
-    public String getBusType() throws Exception {
+    public JSONObject busInfo() throws Exception{
         BusInformationFactory bif=BusInformationFactory.initiate();
         JSONObject jsonObject=bif.getBusInfo(busId);
         JSONObject time=jsonObject.getJSONObject("time");
 
         Map<Date,JSONObject> bst=new HashMap<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm a");
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
         ArrayList <Date> arrayList=new ArrayList();
         for (Iterator<String> it = time.keys(); it.hasNext(); ) {
             String t = it.next();
@@ -55,27 +55,33 @@ public class Bus {
             bst.put(d1,time.getJSONObject(t));
             Log.d("II_TIME",t);
         }
-        Date currentTime=sdf.parse(/*sdf.format(new Date())*/"11:00 AM");
-        Collections.sort(arrayList);
+        Date currentTime=sdf.parse(sdf.format(new Date()));
+        Log.d("TODAY", String.valueOf(currentTime));
         int l=0,r=1;
         if(currentTime.compareTo(arrayList.get(0))<=0||currentTime.compareTo(arrayList.get(arrayList.size()-1))>0){
             l=arrayList.size()-1; //if engine on
             r=0; //if engine off
+            Log.d("II_BUS_TYPE","BOUNDARY "+(currentTime.compareTo(arrayList.get(0))<=0)+"; "+currentTime+"; "+arrayList.get(0));
         }
         else{
             while (r<arrayList.size()){
-                if(arrayList.get(l).compareTo(currentTime)>=0&&arrayList.get(r).compareTo(currentTime)<=0) {
+                if(arrayList.get(l).compareTo(currentTime)<=0&&arrayList.get(r).compareTo(currentTime)>=0) {
                     break;
                 }else {
                     l++;r++;
                 }
             }
         }
+        Log.e("II_BUS_TYPE",String.valueOf(r));
         if(getEngineStatus()){
-            return time.getString(sdf.format(arrayList.get(l)));
+            return time.getJSONObject(sdf.format(arrayList.get(l)));
         }else{
-            return time.getString(sdf.format(arrayList.get(r)));
+            return time.getJSONObject(sdf.format(arrayList.get(r)));
         }
+    }
+
+    public String getBusType() throws Exception {
+        return busInfo().getString("type");
     }
 
     public String whereAreYou() throws Exception {
@@ -95,7 +101,28 @@ public class Bus {
         setBusLon(lon);
         return locationData;
     }
+    public String getNextStartTime() throws Exception{
+        BusInformationFactory bif=BusInformationFactory.initiate();
+        JSONObject jsonObject=bif.getBusInfo(busId);
+        JSONObject time=jsonObject.getJSONObject("time");
 
+        Map<Date,JSONObject> bst=new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+        ArrayList <Date> arrayList=new ArrayList();
+        for (Iterator<String> it = time.keys(); it.hasNext(); ) {
+            String t = it.next();
+            Date d1 = sdf.parse(t);
+            arrayList.add(d1);
+            bst.put(d1,time.getJSONObject(t));
+        }
+        Date currentTime=sdf.parse(sdf.format(new Date()));
+        for(Date d:arrayList){
+            if(d.compareTo(currentTime)>=0){
+                return sdf.format(d);
+            }
+        }
+        return sdf.format(arrayList.get(0));
+    }
     public void setBusLat(double busLat) {
         this.busLat = busLat;
     }
@@ -120,8 +147,8 @@ public class Bus {
         return busName;
     }
 
-    public String getBusRoute() {
-        return busRoute;
+    public String getBusRoute()throws Exception {
+        return busInfo().getString("route");
     }
 
     public boolean getEngineStatus(){

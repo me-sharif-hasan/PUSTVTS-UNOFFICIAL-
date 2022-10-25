@@ -6,7 +6,11 @@ plugins {
 android {
     namespace 'bd.ac.pust.pustvtsunofficial'
     compileSdk 32
+    lintOptions {
 
+        checkReleaseBuilds false
+
+    }
     defaultConfig {
         applicationId "bd.ac.pust.pustvtsunofficial"
         minSdk 21
