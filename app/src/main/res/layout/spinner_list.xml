@@ -1,8 +1,11 @@
-<TextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cust_view"
+    android:minWidth="246dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="10dp"
-    android:textColor="@android:color/holo_red_light"
-    android:textSize="16sp"
-    android:textStyle="bold|italic"/>
+    android:layout_height="48dp"
+    android:gravity="left|center_vertical"
+    android:textColor="@android:color/black"
+    android:textSize="20sp"
+    android:paddingLeft="4dp"
+    android:textIsSelectable="false"/>

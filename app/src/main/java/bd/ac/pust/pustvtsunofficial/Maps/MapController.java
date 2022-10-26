@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -34,9 +35,12 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.StoppageManager.StoppageManager;
 import bd.ac.pust.pustvtsunofficial.Helper.VehiclesInfoBottomSheet;
+import bd.ac.pust.pustvtsunofficial.Maps.Modules.DirectionFinder;
+import bd.ac.pust.pustvtsunofficial.Maps.Modules.DirectionFinderListener;
+import bd.ac.pust.pustvtsunofficial.Maps.Modules.Route;
 import bd.ac.pust.pustvtsunofficial.R;
 
-public class MapController implements OnMapReadyCallback {
+public class MapController implements OnMapReadyCallback, DirectionFinderListener {
     Map<String, MarkerOptions> markerOptionsMap =new HashMap<>();
     Map<String, Marker> markerMap=new HashMap<>();
     Map<String,Boolean> updateState=new HashMap<>();
@@ -47,9 +51,10 @@ public class MapController implements OnMapReadyCallback {
     String focusedBus="";
     boolean hide=false;
     AppCompatActivity context;
-    public MapController(){
-
+    public MapController(AppCompatActivity context){
+        this.context=context;
     }
+    public MapController(){}
 
     public void setContext(AppCompatActivity context) {
         this.context = context;
@@ -57,19 +62,14 @@ public class MapController implements OnMapReadyCallback {
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         gmap=googleMap;
-        createStoppages();
+        notifyStoppageChange();
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(@NonNull Marker marker) {
                 Bus bus= (Bus) marker.getTag();
                 try {
-                    if(!bus.getEngineStatus()) {
-                        VehiclesInfoBottomSheet bottomSheet = new VehiclesInfoBottomSheet(bus.getBusName(), bus.getBusType(), bus.getBusRoute(), bus.getNextStartTime());
-                        bottomSheet.show(context.getSupportFragmentManager(), bottomSheet.getTag());
-                    }else{
-                        VehiclesInfoBottomSheet bottomSheet = new VehiclesInfoBottomSheet(bus.getBusName(), bus.getBusType(), bus.getBusRoute(), "07:08AM","DEGREE","NA");
-                        bottomSheet.show(context.getSupportFragmentManager(), bottomSheet.getTag());
-                    }
+                    VehiclesInfoBottomSheet bottomSheet = new VehiclesInfoBottomSheet(bus.getBusName(), bus.getBusType(), bus.getBusRoute(), bus.getStartTime(bus.getEngineStatus()),bus.getEngineStatus());
+                    bottomSheet.show(context.getSupportFragmentManager(),bottomSheet.getTag());
                 }catch (Exception e){
                     Log.e("II_ERROR","BUS INFORMATION NOT LOADED");
                     e.printStackTrace();
@@ -117,12 +117,11 @@ public class MapController implements OnMapReadyCallback {
 
     Map <Integer,Bus> busIdList=new HashMap<>();
 
-    float offsetX=50;
 
     public void startUpdate2(GoogleMap gmap){
         this.gmap=gmap;
-        Bitmap startIcon=BitmapFactory.decodeResource(Config.getInstance().getMainContext().getResources(), R.mipmap.bus_marker_start);
-        Bitmap normalIcon=BitmapFactory.decodeResource(Config.getInstance().getMainContext().getResources(), R.mipmap.bus_marker);
+        Bitmap startIcon=BitmapFactory.decodeResource(context.getResources(), R.mipmap.bus_marker_start);
+        Bitmap normalIcon=BitmapFactory.decodeResource(context.getResources(), R.mipmap.bus_marker);
         BusFactory.setBusLoadListener(new BusFactory.BusLoadListener() {
             @Override
             public void onBusLoaded(Bus bus,int busKey) {
@@ -131,15 +130,15 @@ public class MapController implements OnMapReadyCallback {
                 bus.setUpdateInterval(new Bus.UpdateActionListener(){
                     boolean currentColor=true;
                     @Override
-                    public void setLocationUpdateInterval(Bus context) {
+                    public void setLocationUpdateInterval(Bus targetBus) {
                         try {
-                            if(!focusedBus.equals(context.getBusId())&&hide) return;
-                            context.whereAreYou();
-                            float lon = (float) context.getBusLon();
-                            float lat = (float) context.getBusLat();
-                            Log.d("II_ENGINE",context.getEngineStatus()+" for "+context.getBusName());
+                            if(!focusedBus.equals(targetBus.getBusId())&&hide) return;
+                            targetBus.whereAreYou();
+                            double lon = targetBus.getBusLon();
+                            double lat = targetBus.getBusLat();
+                            Log.d("II_ENGINE",targetBus.getEngineStatus()+" for "+targetBus.getBusName());
                             Bitmap PmarkerIcon;
-                            if(context.getEngineStatus()){
+                            if(targetBus.getEngineStatus()){
                                 PmarkerIcon =startIcon;
                             }else{
                                 PmarkerIcon=normalIcon;
@@ -156,17 +155,17 @@ public class MapController implements OnMapReadyCallback {
                             }
                             c.drawCircle((float) (markerIcon.getWidth()/2+0.09), markerIcon.getHeight()*0.24f, 15.0F,p);
 
-                            if(markerMap.containsKey(context.getBusId())){
-                                Config.getInstance().getMainContext().runOnUiThread(new Runnable() {
+                            if(markerMap.containsKey(targetBus.getBusId())){
+                                context.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        Marker marker=markerMap.get(context.getBusId());
+                                        Marker marker=markerMap.get(targetBus.getBusId());
                                         marker.setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
                                         marker.setPosition(new LatLng(lat,lon));
                                         if(!hide){
                                             marker.setVisible(true);
                                         }
-                                        if(willAutoFocus&&context.getBusId().equals(focusedBus)){
+                                        if(willAutoFocus&&targetBus.getBusId().equals(focusedBus)){
                                             focus(marker.getPosition());
                                         }
                                     }
@@ -174,15 +173,15 @@ public class MapController implements OnMapReadyCallback {
                             }else{
                                 MarkerOptions markerOptions=createNewMarker(lon,lat);
                                 markerOptions.icon(BitmapDescriptorFactory.fromBitmap(markerIcon));
-                                markerOptions.title(context.getBusName());
+                                markerOptions.title(targetBus.getBusName());
                                 Config.getInstance().getMainContext().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
                                         Marker marker=gmap.addMarker(markerOptions);
-                                        marker.setTag(context);
-                                        markerMap.put(context.getBusId(),marker);
-                                        markerOptionsMap.put(context.getBusId(),markerOptions);
-                                        if(hide&&!focusedBus.equals(context.getBusId())){
+                                        marker.setTag(targetBus);
+                                        markerMap.put(targetBus.getBusId(),marker);
+                                        markerOptionsMap.put(targetBus.getBusId(),markerOptions);
+                                        if(hide&&!focusedBus.equals(targetBus.getBusId())){
                                             marker.setVisible(false);
                                         }else{
                                             marker.setVisible(true);
@@ -224,9 +223,9 @@ public class MapController implements OnMapReadyCallback {
         }
     }
 
-    public void selectBusId(int i, AppCompatActivity context) {
+    public void selectBusId(int i) {
         Log.e("II_ERR",String.valueOf(i)+" "+busIdList.size());
-        if(busIdList==null||!busIdList.containsKey(i)) return;
+        if(busIdList==null||!busIdList.containsKey(i)||gmap==null) return;
         TextView tv=context.findViewById(R.id.bus_name_show);
         Log.i("II_CHECK","BUS SELECTED "+i+" "+"OKAY ");
         @SuppressLint("UseSwitchCompatOrMaterialCode") Switch soloView=context.findViewById(R.id.bus_solo_view);
@@ -296,34 +295,43 @@ public class MapController implements OnMapReadyCallback {
         hide=false;
         context=null;
     }
+
     Map <String,LatLng> stoppages=new HashMap<>();
-    public void addStop(String name,LatLng l){
+    public void addStoppage(String name,LatLng l){
         stoppages.put(name,l);
     }
-    public void createStoppages(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (StoppageManager.getStoppages()==null) {
-                    try{
-                        TimeUnit.MILLISECONDS.sleep(3000);
-                    }catch (Exception e){}
+    synchronized public void notifyStoppageChange(){
+        if(gmap==null) return;
+        for(String key:stoppages.keySet()){
+            LatLng l=stoppages.get(key);
+            MarkerOptions mop=createNewMarker(l.longitude,l.latitude);
+            Bitmap b=BitmapFactory.decodeResource(context.getResources(),R.mipmap.bus_stop);
+            mop.icon(BitmapDescriptorFactory.fromBitmap(b));
+            mop.title(key);
+            mop.draggable(true);
+            context.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    gmap.addMarker(mop);
                 }
-                for(String name:stoppages.keySet()){
-                    LatLng latLng=stoppages.get(name);
-                    MarkerOptions moc=createNewMarker(latLng.longitude,latLng.latitude);
-                    moc.title(name);
-                    Bitmap bitmap=BitmapFactory.decodeResource(context.getResources(),R.mipmap.bus_stop);
-                    moc.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
-                    //moc.draggable(true);
-                    context.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            gmap.addMarker(moc);
-                        }
-                    });
-                }
-            }
-        }).start();
+            });
+        }
+        stoppages.clear();
+    }
+
+    public void showRoute(LatLng stoppage) {
+        if(focusedBus.equals("")) return;
+        Log.d("II_000",stoppage.latitude+" "+stoppage.longitude);
+        new DirectionFinder(this,"das","dfsf");
+    }
+
+    @Override
+    public void onDirectionFinderStart() {
+
+    }
+
+    @Override
+    public void onDirectionFinderSuccess(List<Route> route) {
+
     }
 }

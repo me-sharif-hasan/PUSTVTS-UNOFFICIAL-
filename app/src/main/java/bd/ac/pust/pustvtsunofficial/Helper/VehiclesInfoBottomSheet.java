@@ -24,12 +24,12 @@ public class VehiclesInfoBottomSheet extends BottomSheetDialogFragment {
     boolean isRunning;
 
     public VehiclesInfoBottomSheet(String vName_value, String vType_value, String road_value,
-                                   String sTime_value) {
+                                   String sTime_value, boolean engine) {
         this.vName_value = vName_value;
         this.vType_value = vType_value;
         this.road_value = road_value;
         this.sTime_value = sTime_value;
-        isRunning = false;
+        isRunning = engine;
     }
 
     public VehiclesInfoBottomSheet(String vName_value, String vType_value, String road_value,
@@ -71,20 +71,17 @@ public class VehiclesInfoBottomSheet extends BottomSheetDialogFragment {
         enggOff = view.findViewById(R.id.cl_while_engg_off);
         ImageView imgv3=view.findViewById(R.id.imageView3);
 
+        TextView trip=view.findViewById(R.id.trip);
+
+        if(isRunning) trip.setText("CURRENT TRIP");
+        else trip.setText("NEXT TRIP");
+
         vName.setText(vName_value);
         vType.setText("("+vType_value+")");
         road.setText(road_value);
-        if(isRunning){
-            imgv3.setImageResource(R.mipmap.bus_marker_start);
-            enggOff.setVisibility(View.INVISIBLE);
-            enggOn.setVisibility(View.VISIBLE);
-            lastupdate.setText(lastUpdate_value);
-            prevStopage.setText("Last reported: "+prevStopage_value);
-            prevStopagePassTime.setText(prevStopagePassTime_value);
-        }else{
-            imgv3.setImageResource(R.mipmap.bus_marker);
-            enggOff.setVisibility(View.VISIBLE);
-            enggOn.setVisibility(View.INVISIBLE);
-            stime.setText(sTime_value);        }
+        if(isRunning) imgv3.setImageResource(R.mipmap.bus_marker_start); else imgv3.setImageResource(R.mipmap.bus_marker);
+        //enggOff.setVisibility(View.VISIBLE);
+        //enggOn.setVisibility(View.INVISIBLE);
+        stime.setText(sTime_value);
     }
 }

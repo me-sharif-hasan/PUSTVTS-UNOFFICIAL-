@@ -15,6 +15,7 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInfo;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInformationFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.StoppageManager.StoppageManager;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
@@ -45,6 +46,8 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Map;
@@ -62,6 +65,8 @@ public class BusLocatorActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //ensure bus information is loaded;
+        BusInformationFactory.initiate();
         mpc.setContext(this);
         setContentView(R.layout.activity_bus_locator);
         bus_finder = findViewById(R.id.fl_fragmentHolder);
@@ -77,6 +82,9 @@ public class BusLocatorActivity extends AppCompatActivity {
         stopedInfo = findViewById(R.id.stopage_name);
 
 
+        Spinner stoppage_selector=findViewById(R.id.stoppage_selector);
+        stoppage_selector.setEnabled(false);
+
 
         Switch isolator=findViewById(R.id.bus_solo_view);
         isolator.setOnClickListener(new View.OnClickListener() {
@@ -89,13 +97,20 @@ public class BusLocatorActivity extends AppCompatActivity {
         Spinner bus_selector=findViewById(R.id.bus_selector);
         ArrayAdapter<String> busSelectorAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, android.R.id.text1);
         busSelectorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+
         bus_selector.setAdapter(busSelectorAdapter);
 
         bus_selector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                mpc.selectBusId(i,BusLocatorActivity.this);
-                closeDrawer(drawerLayout);
+                mpc.selectBusId(i);
+                if(i==0){
+                    closeDrawer(drawerLayout);
+                    stoppage_selector.setEnabled(false);
+                }else{
+                    stoppage_selector.setEnabled(true);
+                }
             }
 
             @Override
@@ -104,25 +119,37 @@ public class BusLocatorActivity extends AppCompatActivity {
             }
         });
 
-        Spinner stoppage_selector=findViewById(R.id.stoppage_selector);
         ArrayAdapter<String> stoppageSelectorAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, android.R.id.text1);
         busSelectorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         stoppage_selector.setAdapter(stoppageSelectorAdapter);
-
-        StoppageManager.setOnStoppageLoadListener(new StoppageManager.StoppageLoadEvent() {
+        stoppageSelectorAdapter.add("NOT SELECTED");
+        stoppageSelectorAdapter.notifyDataSetChanged();
+        StoppageManager.init().setOnStoppageLoadListener(new StoppageManager.StoppageLoadEvent() {
             @Override
             public void onStoppageCreated(String stoppageName, LatLng l) {
-                stoppageSelectorAdapter.add(stoppageName);
-                stoppageSelectorAdapter.notifyDataSetChanged();
-                mpc.addStop(stoppageName,l);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        stoppageSelectorAdapter.add(stoppageName);
+                        stoppageSelectorAdapter.notifyDataSetChanged();
+                    }
+                });
+                mpc.addStoppage(stoppageName,l);
+                mpc.notifyStoppageChange();
             }
         });
-        StoppageManager.initiate();
 
         stoppage_selector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-               // mpc.setStopage
+                if(i==0) return;
+                TextView t= (TextView) view;
+                Log.d("II_420", (String) t.getText());
+                try {
+                    mpc.showRoute(StoppageManager.init().getStoppage((String) t.getText()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -149,38 +176,45 @@ public class BusLocatorActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true){
-                    try{
-                        BusFactory.createBusList(new BusFactory.BusCreatedEvent() {
-                            @Override
-                            public void onBusCreated(String busName,String busId) {
-                                BusLocatorActivity.this.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        busSelectorAdapter.add(busName);
-                                        busSelectorAdapter.sort(new Comparator<String>() {
-                                            @Override
-                                            public int compare(String s, String t1) {
-                                                return s.compareTo(t1);
-                                            }
-                                        });
-                                        busSelectorAdapter.notifyDataSetChanged();
+                try {
+                    BusFactory.setBusLoadListener(new BusFactory.BusLoadListener() {
+                        @Override
+                        public void onBusLoaded(Bus bus, int busKey) {
+                            Log.d("II_077",bus.getBusId());
+                            BusLocatorActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    String ind = bus.getBusName() + " ";
+                                    try {
+                                        String busType = bus.getBusType();
+                                        String busRoute = bus.getBusRoute();
+                                        ind += " [" + busType + "] \uD83D\uDE8F " + busRoute;
+                                        Log.d("II_YB", busType);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        Log.e("II_08", e.getLocalizedMessage());
                                     }
-                                });
-                            }
-                        });
-                        break;
-                    }catch (Exception e){
-                        try {
-                            TimeUnit.MILLISECONDS.sleep(1000);
-                        }catch (Exception te){
-
+                                    busSelectorAdapter.add(ind);
+                                    busSelectorAdapter.sort(new Comparator<String>() {
+                                        @Override
+                                        public int compare(String s, String t1) {
+                                            return s.compareTo(t1);
+                                        }
+                                    });
+                                    busSelectorAdapter.notifyDataSetChanged();
+                                }
+                            });
                         }
-                        e.printStackTrace();
-                    }
+                    });
+                    BusFactory.createBusList(null);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }).start();
+
+
+
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

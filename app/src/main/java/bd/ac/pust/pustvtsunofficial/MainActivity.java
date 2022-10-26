@@ -3,13 +3,9 @@ package bd.ac.pust.pustvtsunofficial;
 import androidx.appcompat.app.AppCompatActivity;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.CookieAndSession.CookieManger;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
-import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerFactory;
-import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInformationFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
-import bd.ac.pust.pustvtsunofficial.BusLocationProvider.StoppageManager.StoppageManager;
-import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -23,23 +19,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import org.json.JSONObject;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
-
-import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends AppCompatActivity {
     Button retry;
@@ -118,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         if(userAndPass!=null) {
                             BusFactory.checkUsernamePassword(userAndPass[0], userAndPass[1]);
-                            Log.d("IILOG","USING AUTO LOG IN");
+                            Log.d("IILOG","USING AUTO LOG INX ");
                             Intent i=new Intent(MainActivity.this,BusLocatorActivity.class);
                             startActivity(i);
                             finish();
