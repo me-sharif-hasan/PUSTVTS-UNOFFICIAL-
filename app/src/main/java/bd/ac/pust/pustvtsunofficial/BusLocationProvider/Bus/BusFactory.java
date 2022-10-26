@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import androidx.annotation.Nullable;
 import androidx.core.text.HtmlKt;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.CookieAndSession.CookieManger;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.Interfaces.BusTrackerInterface;
@@ -33,8 +34,12 @@ public class BusFactory {
     }
     private static BusLoadListener bll=null;
 
+    private static ArrayList <BusLoadListener> bla=new ArrayList<>();
     public static void setBusLoadListener(BusLoadListener bll) {
+        Log.e("II_AC","SETTING");
+        System.out.println("Printing stack trace:");
         BusFactory.bll = bll;
+        bla.add(bll);
     }
 
     private static Map<Integer,Bus> buses = new HashMap<>();
@@ -42,9 +47,10 @@ public class BusFactory {
     public static void createBus(int key, String busId, String busName, String busRoute,boolean willsave) throws Exception {
         Bus newBus = new Bus(busId, busName, busRoute);
         if(willsave)buses.put(key,newBus);
-        if(bll!=null){
-
-            bll.onBusLoaded(newBus,key);
+        if(bla!=null&&bla.size()!=0){
+            Log.d("II_007","Calling");
+            //bll.onBusLoaded(newBus,key);
+            for(BusLoadListener b:bla) b.onBusLoaded(newBus,key);
         }
     }
     public static void createBus(int key, String busId, String busName, String busRoute) throws Exception {
@@ -69,22 +75,22 @@ public class BusFactory {
     public static Map<Integer, Bus> getBuses(){
         return buses;
     }
-    public static void createBusList(BusCreatedEvent bce) throws Exception{
+    public static void createBusList(@Nullable BusCreatedEvent bce) throws Exception{
         URL url=new URL("https://pustvts.com/app_usersuser_dashboard");
         HttpsURLConnection httpsURLConnection= (HttpsURLConnection) url.openConnection();
         httpsURLConnection.setRequestProperty("Cookie", CookieManger.getInstance().getCookie(2)+";"+CookieManger.getInstance().getCookie(3));
         Scanner s=new Scanner(httpsURLConnection.getInputStream());
         StringBuilder b=new StringBuilder();
         while (s.hasNextLine()){
-            b.append(s.nextLine()+"\n");
+            b.append(s.nextLine()).append("\n");
         }
         Document doc= Jsoup.parse(b.toString());
         Elements rows=doc.getElementsByTag("tr");
         if(rows.size()==0){
             throw new Exception("NO BUS FOUND");
         }
-        createBus(0,"N/A","SHOW ALL");
-        bce.onBusCreated("ALL","N/A");
+        createBus(0,"N/A","ALL");
+        if(bce!=null) bce.onBusCreated("ALL","N/A");
         int i=1;
         for(Element tr:rows){
             Elements column=tr.getElementsByTag("td");
@@ -100,7 +106,7 @@ public class BusFactory {
                     while (true) {
                         try {
                             createBus(cpy, busLink, busName);
-                            bce.onBusCreated(busName, busLink);
+                            if(bce!=null) bce.onBusCreated(busName, busLink);
                             break;
                         } catch (Exception e) {
                             try {

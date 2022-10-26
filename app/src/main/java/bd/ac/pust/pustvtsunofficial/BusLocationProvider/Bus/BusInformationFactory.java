@@ -9,31 +9,46 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import javax.net.ssl.HttpsURLConnection;
+
 public class BusInformationFactory {
     private BusInformationFactory(){
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    Log.d("II_NETDUMP","COLLECTING BUS DATA");
-                    URL u=new URL("http://10.0.2.2/BusInfo.json");
-                    HttpURLConnection httpURLConnection= (HttpURLConnection) u.openConnection();
-                    httpURLConnection.setRequestMethod("GET");
-                    httpURLConnection.setRequestProperty("USER-AGENT","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36");
-                    httpURLConnection.setConnectTimeout(1000);
-                    httpURLConnection.connect();
-                    Log.d("II_NETDUMP","CONNECTED");
-                    InputStream is=httpURLConnection.getInputStream();
-                    byte []buff=new byte[1024];
-                    int l=is.read(buff);
-                    String out=new String(buff,0,l);
-                    JSONObject jsonObject=new JSONObject(out);
-                    busData=new JSONObject(jsonObject.getString("bus"));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                while (true) {
+                    try {
+                        Log.d("II_NETDUMP", "COLLECTING BUS DATA x");
+                        URL u = new URL("https://raw.githubusercontent.com/me-sharif-hasan/blog-content/main/BusInfo.json");
+                        HttpsURLConnection httpsURLConnection = (HttpsURLConnection) u.openConnection();
+                        httpsURLConnection.setRequestMethod("GET");
+                        httpsURLConnection.setRequestProperty("USER-AGENT", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36");
+                        httpsURLConnection.setConnectTimeout(1000);
+                        httpsURLConnection.connect();
+                        Log.d("II_NETDUMP", "CONNECTED");
+                        InputStream is = httpsURLConnection.getInputStream();
+                        byte[] buff = new byte[20024];
+                        int l = is.read(buff);
+                        String out = new String(buff, 0, l);
+                        Log.d("II_BUS_INFO", out);
+                        JSONObject jsonObject = new JSONObject(out);
+                        busData = new JSONObject(jsonObject.getString("bus"));
+                        if(bil!=null) bil.onBusInfoLoaded();
+                        return;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }).start();
+    }
+    BusInfoLoaded bil=null;
+    public void setBusInfoLoadedEvent(BusInfoLoaded b){
+        bil=b;
+    }
+
+    public interface BusInfoLoaded{
+        public void onBusInfoLoaded();
     }
 
     JSONObject busData;
@@ -42,7 +57,7 @@ public class BusInformationFactory {
         return new JSONObject(busData.getString(busId));
     }
 
-    private static BusInformationFactory instance;
+    private static BusInformationFactory instance=null;
     public static BusInformationFactory initiate(){
         if(instance==null) instance=new BusInformationFactory();
         return instance;

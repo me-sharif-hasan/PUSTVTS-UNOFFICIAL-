@@ -22,6 +22,10 @@
             android:exported="false"
             android:label="@string/title_activity_bus_finder" />
         <activity
+            android:name=".BusNavigationController"
+            android:exported="false"
+            android:label="@string/title_activity_bus_finder" />
+        <activity
             android:name=".LoginActivity"
             android:exported="false">
             <meta-data

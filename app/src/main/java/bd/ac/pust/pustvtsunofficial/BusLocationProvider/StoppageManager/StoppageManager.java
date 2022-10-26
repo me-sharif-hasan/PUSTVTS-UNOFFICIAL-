@@ -4,55 +4,47 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.sql.Time;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-import javax.xml.namespace.QName;
+import javax.net.ssl.HttpsURLConnection;
 
 public class StoppageManager {
-    private static Map<String,LatLng> stopages=new HashMap<>();
-    public static void initiate(){
+    private static StoppageManager stoppageManager;
+    private StoppageManager(){
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
-                    try {
-                        init();
-                        return;
-                    } catch (Exception e) {
-                        try {
-                            TimeUnit.MILLISECONDS.sleep(4000);
-                        } catch (InterruptedException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
+                try {
+                    load();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }).start();
     }
-    public static void init() throws Exception{
+    public static StoppageManager init(){
+        if(stoppageManager==null) stoppageManager=new StoppageManager();
+        return stoppageManager;
+    }
+    private Map<String,LatLng> stoppages =new HashMap<>();
+    public void load() throws Exception{
         Log.d("II_NETDUMP","COLLECTING BUS DATA");
-        URL u=new URL("http://10.0.2.2/stoppage.txt");
-        HttpURLConnection httpURLConnection= (HttpURLConnection) u.openConnection();
-        httpURLConnection.setRequestMethod("GET");
-        httpURLConnection.setRequestProperty("USER-AGENT","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36");
-        httpURLConnection.setConnectTimeout(1000);
-        httpURLConnection.connect();
-        Log.d("II_NETDUMP","CONNECTED");
-        BufferedReader is=new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream(),StandardCharsets.UTF_8));
+        URL u=new URL("https://raw.githubusercontent.com/me-sharif-hasan/blog-content/main/stoppage.txt");
+        HttpsURLConnection httpsURLConnection= (HttpsURLConnection) u.openConnection();
+        httpsURLConnection.setConnectTimeout(1000);
+        httpsURLConnection.connect();
+        Log.d("II_STOP","CONNECTED");
+        BufferedReader is=new BufferedReader(new InputStreamReader(httpsURLConnection.getInputStream(),StandardCharsets.UTF_8));
+        Log.d("II_STOP","READING");
         char []buff=new char[1024];
         int l=is.read(buff);
         String out=new String(buff,0,l);
+        Log.d("II_STOP",out);
         String []outs=out.split("\n");
         for(String ot:outs){
             String []poss=ot.split("\t");
@@ -62,22 +54,25 @@ public class StoppageManager {
             for(int i=1;i<poss.length-1;i++){
                 if(!poss[i].equals("")) lat=poss[i];
             }
-            LatLng lt=new LatLng(Float.parseFloat(lat),Float.parseFloat(lang));
+            LatLng lt=new LatLng(Double.parseDouble(lat),Double.parseDouble(lang));
             Log.d("II_STOPS",name+" "+lang+" "+lat);
-            stopages.put(name,lt);
+            stoppages.put(name,lt);
             if(sle!=null) sle.onStoppageCreated(name,lt);
         }
         Log.d("II_STOP",out);
     }
-    private static StoppageLoadEvent sle=null;
-    public static void setOnStoppageLoadListener(StoppageLoadEvent stpe){
+
+    public LatLng getStoppage(String name) throws Exception {
+        if(stoppages.containsKey(name)) return stoppages.get(name);
+        else throw new Exception("No such stoppage");
+    }
+
+    private StoppageLoadEvent sle=null;
+    public void setOnStoppageLoadListener(StoppageLoadEvent stpe){
         sle=stpe;
     }
 
     public interface StoppageLoadEvent{
         public void onStoppageCreated(String stoppageName,LatLng l);
-    }
-    public static Map <String,LatLng> getStoppages(){
-        return stopages;
     }
 }

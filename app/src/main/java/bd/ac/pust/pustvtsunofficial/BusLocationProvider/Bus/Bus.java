@@ -39,8 +39,7 @@ public class Bus {
         this.busRoute = busRoute;
         busTrackerInterface = TrackerFactory.getTracker(Utility.TRACKER_TYPE);
     }
-
-    public JSONObject busInfo() throws Exception{
+    public static JSONObject busInfo(String busId,boolean busEngineStatus) throws Exception{
         BusInformationFactory bif=BusInformationFactory.initiate();
         JSONObject jsonObject=bif.getBusInfo(busId);
         JSONObject time=jsonObject.getJSONObject("time");
@@ -73,7 +72,8 @@ public class Bus {
             }
         }
         Log.e("II_BUS_TYPE",String.valueOf(r));
-        if(getEngineStatus()){
+        if(busEngineStatus){
+
             return time.getJSONObject(sdf.format(arrayList.get(l)));
         }else{
             return time.getJSONObject(sdf.format(arrayList.get(r)));
@@ -81,7 +81,10 @@ public class Bus {
     }
 
     public String getBusType() throws Exception {
-        return busInfo().getString("type");
+        return busInfo(getBusId(),getEngineStatus()).getString("type");
+    }
+    public static String getBusType(String busId,boolean engineStatus) throws Exception {
+        return busInfo(busId,engineStatus).getString("type");
     }
 
     public String whereAreYou() throws Exception {
@@ -101,7 +104,7 @@ public class Bus {
         setBusLon(lon);
         return locationData;
     }
-    public String getNextStartTime() throws Exception{
+    public String getStartTime(boolean returnCurrent) throws Exception{
         BusInformationFactory bif=BusInformationFactory.initiate();
         JSONObject jsonObject=bif.getBusInfo(busId);
         JSONObject time=jsonObject.getJSONObject("time");
@@ -116,12 +119,16 @@ public class Bus {
             bst.put(d1,time.getJSONObject(t));
         }
         Date currentTime=sdf.parse(sdf.format(new Date()));
+        String now=sdf.format(arrayList.get(0));
         for(Date d:arrayList){
-            if(d.compareTo(currentTime)>=0){
+            Log.d("II_0998",d.toString()+" "+currentTime.toString());
+            if(!returnCurrent&&d.compareTo(currentTime)>=0){
                 return sdf.format(d);
+            }else if(returnCurrent&&currentTime.compareTo(d)>=0){
+                now= sdf.format(d);
             }
         }
-        return sdf.format(arrayList.get(0));
+        return now;
     }
     public void setBusLat(double busLat) {
         this.busLat = busLat;
@@ -148,7 +155,10 @@ public class Bus {
     }
 
     public String getBusRoute()throws Exception {
-        return busInfo().getString("route");
+        return busInfo(getBusId(),getEngineStatus()).getString("route");
+    }
+    public static String getBusRoute(String busId, boolean busEngineStatus) throws Exception {
+        return busInfo(busId,busEngineStatus).getString("route");
     }
 
     public boolean getEngineStatus(){
