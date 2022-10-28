@@ -31,7 +31,7 @@ public class StoppageManager {
         if(stoppageManager==null) stoppageManager=new StoppageManager();
         return stoppageManager;
     }
-    private Map<String,LatLng> stoppages =new HashMap<>();
+    private final Map<String,LatLng> stoppages =new HashMap<>();
     public void load() throws Exception{
         Log.d("II_NETDUMP","COLLECTING BUS DATA");
         URL u=new URL("https://raw.githubusercontent.com/me-sharif-hasan/blog-content/main/stoppage.txt");
@@ -73,6 +73,6 @@ public class StoppageManager {
     }
 
     public interface StoppageLoadEvent{
-        public void onStoppageCreated(String stoppageName,LatLng l);
+        void onStoppageCreated(String stoppageName, LatLng l);
     }
 }

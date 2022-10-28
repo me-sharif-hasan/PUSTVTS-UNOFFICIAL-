@@ -1,7 +1,6 @@
 package bd.ac.pust.pustvtsunofficial.Maps;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -16,12 +15,14 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,14 +34,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
-import bd.ac.pust.pustvtsunofficial.BusLocationProvider.StoppageManager.StoppageManager;
 import bd.ac.pust.pustvtsunofficial.Helper.VehiclesInfoBottomSheet;
-import bd.ac.pust.pustvtsunofficial.Maps.Modules.DirectionFinder;
-import bd.ac.pust.pustvtsunofficial.Maps.Modules.DirectionFinderListener;
-import bd.ac.pust.pustvtsunofficial.Maps.Modules.Route;
 import bd.ac.pust.pustvtsunofficial.R;
 
-public class MapController implements OnMapReadyCallback, DirectionFinderListener {
+public class MapController implements OnMapReadyCallback {
     Map<String, MarkerOptions> markerOptionsMap =new HashMap<>();
     Map<String, Marker> markerMap=new HashMap<>();
     Map<String,Boolean> updateState=new HashMap<>();
@@ -181,11 +178,7 @@ public class MapController implements OnMapReadyCallback, DirectionFinderListene
                                         marker.setTag(targetBus);
                                         markerMap.put(targetBus.getBusId(),marker);
                                         markerOptionsMap.put(targetBus.getBusId(),markerOptions);
-                                        if(hide&&!focusedBus.equals(targetBus.getBusId())){
-                                            marker.setVisible(false);
-                                        }else{
-                                            marker.setVisible(true);
-                                        }
+                                        marker.setVisible(!hide || focusedBus.equals(targetBus.getBusId()));
                                         if(willZoom){
                                             focus(marker.getPosition());
                                             willZoom=false;
@@ -224,7 +217,7 @@ public class MapController implements OnMapReadyCallback, DirectionFinderListene
     }
 
     public void selectBusId(int i) {
-        Log.e("II_ERR",String.valueOf(i)+" "+busIdList.size());
+        Log.e("II_ERR", i +" "+busIdList.size());
         if(busIdList==null||!busIdList.containsKey(i)||gmap==null) return;
         TextView tv=context.findViewById(R.id.bus_name_show);
         Log.i("II_CHECK","BUS SELECTED "+i+" "+"OKAY ");
@@ -252,6 +245,7 @@ public class MapController implements OnMapReadyCallback, DirectionFinderListene
         soloView.setVisibility(View.VISIBLE);
         soloView.setChecked(true);
         isolateView(soloView);
+        markerMap.get(busId).showInfoWindow();
         focus(Objects.requireNonNull(markerMap.get(busId)).getPosition());
     }
     public void isolateView(Switch sw){
@@ -277,6 +271,7 @@ public class MapController implements OnMapReadyCallback, DirectionFinderListene
             context.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    markerMap.get(focusedBus).showInfoWindow();
                     focus(markerMap.get(focusedBus).getPosition());
                 }
             });
@@ -297,6 +292,7 @@ public class MapController implements OnMapReadyCallback, DirectionFinderListene
     }
 
     Map <String,LatLng> stoppages=new HashMap<>();
+    Map <String,Marker> stoppageMarkers=new HashMap<>();
     public void addStoppage(String name,LatLng l){
         stoppages.put(name,l);
     }
@@ -312,26 +308,23 @@ public class MapController implements OnMapReadyCallback, DirectionFinderListene
             context.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    gmap.addMarker(mop);
+                    stoppageMarkers.put(key,gmap.addMarker(mop));
                 }
             });
         }
         stoppages.clear();
     }
 
-    public void showRoute(LatLng stoppage) {
-        if(focusedBus.equals("")) return;
-        Log.d("II_000",stoppage.latitude+" "+stoppage.longitude);
-        new DirectionFinder(this,"das","dfsf");
-    }
-
-    @Override
-    public void onDirectionFinderStart() {
-
-    }
-
-    @Override
-    public void onDirectionFinderSuccess(List<Route> route) {
-
+    public void isolateStoppage(String name) {
+        if(!stoppageMarkers.containsKey(name)) return;
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                willAutoFocus=false;
+                focus(stoppageMarkers.get(name).getPosition());
+                stoppageMarkers.get(name).showInfoWindow();
+                if(!focusedBus.equals("")) context.findViewById(R.id.recenter).setVisibility(View.VISIBLE);
+            }
+        });
     }
 }

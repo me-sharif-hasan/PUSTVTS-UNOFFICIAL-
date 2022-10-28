@@ -30,11 +30,11 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
 
 public class BusFactory {
     public interface BusLoadListener{
-        public void onBusLoaded(Bus bus,int busKey);
+        void onBusLoaded(Bus bus, int busKey);
     }
     private static BusLoadListener bll=null;
 
-    private static ArrayList <BusLoadListener> bla=new ArrayList<>();
+    private static final ArrayList <BusLoadListener> bla=new ArrayList<>();
     public static void setBusLoadListener(BusLoadListener bll) {
         Log.e("II_AC","SETTING");
         System.out.println("Printing stack trace:");

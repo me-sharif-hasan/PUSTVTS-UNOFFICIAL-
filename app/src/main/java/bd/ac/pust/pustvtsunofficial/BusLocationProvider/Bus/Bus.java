@@ -178,7 +178,7 @@ public class Bus {
         }).start();
     }
     public interface UpdateActionListener{
-        public void setLocationUpdateInterval(Bus context);
+        void setLocationUpdateInterval(Bus context);
     }
     public void aboardAllOperation(){
         aboard=true;

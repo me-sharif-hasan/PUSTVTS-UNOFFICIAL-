@@ -20,7 +20,7 @@ public abstract class TrackerConfig {
     public static int TRACK_BY_API = 2;
     public static String USERNAME = "";
     public static String PASSWORD = "";
-    private static String loginDir= Config.getInstance().getMainContext().getFilesDir()+"lgin.cr";
+    private static final String loginDir= Config.getInstance().getMainContext().getFilesDir()+"lgin.cr";
 
     public static void updateUserAndPass(String username,String pass) throws Exception{
         System.out.println("III "+loginDir);
