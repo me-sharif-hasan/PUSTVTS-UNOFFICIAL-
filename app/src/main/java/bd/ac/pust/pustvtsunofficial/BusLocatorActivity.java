@@ -8,18 +8,13 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import bd.ac.pust.pustvtsunofficial.Alarm.AlarmActivity;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.CookieAndSession.CookieManger;
-import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.Interfaces.BusTrackerInterface;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
-import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
-import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInfo;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInformationFactory;
-import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.StoppageManager.StoppageManager;
-import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
-import bd.ac.pust.pustvtsunofficial.Helper.VehiclesInfoBottomSheet;
 import bd.ac.pust.pustvtsunofficial.Maps.MapController;
 
 import android.annotation.SuppressLint;
@@ -32,7 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -42,16 +36,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class BusLocatorActivity extends AppCompatActivity {
     FrameLayout bus_finder;
@@ -66,7 +54,6 @@ public class BusLocatorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //ensure bus information is loaded;
-        BusInformationFactory.initiate();
         mpc.setContext(this);
         setContentView(R.layout.activity_bus_locator);
         bus_finder = findViewById(R.id.fl_fragmentHolder);
@@ -83,7 +70,6 @@ public class BusLocatorActivity extends AppCompatActivity {
 
 
         Spinner stoppage_selector=findViewById(R.id.stoppage_selector);
-        stoppage_selector.setEnabled(false);
 
 
         Switch isolator=findViewById(R.id.bus_solo_view);
@@ -105,12 +91,7 @@ public class BusLocatorActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 mpc.selectBusId(i);
-                if(i==0){
-                    closeDrawer(drawerLayout);
-                    stoppage_selector.setEnabled(false);
-                }else{
-                    stoppage_selector.setEnabled(true);
-                }
+                closeDrawer(drawerLayout);
             }
 
             @Override
@@ -122,7 +103,6 @@ public class BusLocatorActivity extends AppCompatActivity {
         ArrayAdapter<String> stoppageSelectorAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, android.R.id.text1);
         busSelectorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         stoppage_selector.setAdapter(stoppageSelectorAdapter);
-        stoppageSelectorAdapter.add("NOT SELECTED");
         stoppageSelectorAdapter.notifyDataSetChanged();
         StoppageManager.init().setOnStoppageLoadListener(new StoppageManager.StoppageLoadEvent() {
             @Override
@@ -140,13 +120,17 @@ public class BusLocatorActivity extends AppCompatActivity {
         });
 
         stoppage_selector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            boolean first=true;
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if(i==0) return;
+                if(first){
+                    first=false;
+                    return;
+                }
                 TextView t= (TextView) view;
                 Log.d("II_420", (String) t.getText());
                 try {
-                    mpc.showRoute(StoppageManager.init().getStoppage((String) t.getText()));
+                    mpc.isolateStoppage((String) t.getText());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -214,6 +198,13 @@ public class BusLocatorActivity extends AppCompatActivity {
         }).start();
 
 
+        add_alearm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i=new Intent(BusLocatorActivity.this, AlarmActivity.class);
+                startActivity(i);
+            }
+        });
 
         logout.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -19,8 +19,13 @@ public class VehiclesInfoBottomSheet extends BottomSheetDialogFragment {
 
     private TextView vName,vType,road,stime,lastupdate,prevStopage,prevStopagePassTime;
     private ConstraintLayout enggOn,enggOff;
-    private String vName_value,vType_value,road_value,sTime_value,lastUpdate_value,prevStopage_value,
-            prevStopagePassTime_value;
+    private final String vName_value;
+    private final String vType_value;
+    private final String road_value;
+    private String sTime_value;
+    private String lastUpdate_value;
+    private String prevStopage_value;
+    private String prevStopagePassTime_value;
     boolean isRunning;
 
     public VehiclesInfoBottomSheet(String vName_value, String vType_value, String road_value,

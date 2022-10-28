@@ -33,8 +33,6 @@ public class MainActivity extends AppCompatActivity {
         retry=findViewById(R.id.retry);
         pb=findViewById(R.id.progressBar);
 
-        BusInformationFactory.initiate();
-
 
         //Creating buses
         retry.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("IILOG","Moving on");
         try {
             Log.d("II_CON","CHECKING");
+            BusInformationFactory.initiate();
             BusFactory.checkBusCanBeConnected(); //for connecting purpose.
             Log.d("II_CON","CONNECTION OK");
         } catch (Exception e) {
