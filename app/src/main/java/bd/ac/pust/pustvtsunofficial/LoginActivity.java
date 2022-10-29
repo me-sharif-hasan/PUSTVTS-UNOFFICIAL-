@@ -37,8 +37,8 @@ public class LoginActivity extends AppCompatActivity {
         logo=findViewById(R.id.imageView2);
         progressBar=findViewById(R.id.login_load);
 
-        LocationPermissionChecker locationPermissionChecker=new LocationPermissionChecker(this);
-        locationPermissionChecker.checkPermission();
+        //LocationPermissionChecker locationPermissionChecker=new LocationPermissionChecker(this);
+        //locationPermissionChecker.checkPermission();
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override

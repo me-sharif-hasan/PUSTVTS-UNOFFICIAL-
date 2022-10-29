@@ -71,12 +71,12 @@ public class Bus {
                 }
             }
         }
-        Log.e("II_BUS_TYPE",String.valueOf(r));
-        if(busEngineStatus){
+        Log.e("II_BUS_TYPE",String.valueOf(r)+" "+sdf.format(arrayList.get(r)));
 
-            return time.getJSONObject(sdf.format(arrayList.get(l)));
+        if(busEngineStatus){
+            return time.getJSONObject(sdf.format(arrayList.get(l)).toUpperCase(Locale.ROOT));
         }else{
-            return time.getJSONObject(sdf.format(arrayList.get(r)));
+            return time.getJSONObject(sdf.format(arrayList.get(r)).toUpperCase(Locale.ROOT));
         }
     }
 
