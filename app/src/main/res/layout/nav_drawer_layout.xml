@@ -10,7 +10,7 @@
         android:layout_height="100dp"
         android:layout_margin="16dp"
         android:onClick="BusIC_clickListener"
-        android:src="@drawable/bus_icon"/>
+        android:src="@mipmap/bus_icon"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -39,7 +39,7 @@
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/bus_icon"/>
+            android:src="@mipmap/bus_icon"/>
 
         <Spinner
             android:id="@+id/bus_selector"
