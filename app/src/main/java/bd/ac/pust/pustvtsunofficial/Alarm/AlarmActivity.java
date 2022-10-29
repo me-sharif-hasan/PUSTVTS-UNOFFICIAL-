@@ -1,6 +1,11 @@
 package bd.ac.pust.pustvtsunofficial.Alarm;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import bd.ac.pust.pustvtsunofficial.Alarm.Adapter.AlarmAdapter;
+import bd.ac.pust.pustvtsunofficial.Alarm.Model.AlarmModel;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInformationFactory;
@@ -24,6 +29,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -31,12 +37,26 @@ import java.util.Map;
 
 public class AlarmActivity extends AppCompatActivity {
 
+    RecyclerView recyclerView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
         Spinner bus_selector = findViewById(R.id.bus_list_spinnner);
-        ArrayAdapter<String> busSelectorAdapter = new ArrayAdapter<String>(AlarmActivity.this, android.R.layout.simple_spinner_item, android.R.id.text1);
+        recyclerView = findViewById(R.id.rv_alarm_show);
+
+        ArrayList<AlarmModel> arrayList = new ArrayList<>();
+        arrayList.add(new AlarmModel("Bus 3","02:25"));
+        arrayList.add(new AlarmModel("Bus 9","01:25"));
+        arrayList.add(new AlarmModel("Bus 3","05:10"));
+        AlarmAdapter adapter = new AlarmAdapter(AlarmActivity.this,arrayList);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(AlarmActivity.this);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(layoutManager);
+
+        ArrayAdapter<String> busSelectorAdapter = new ArrayAdapter<String>(AlarmActivity.this,
+                android.R.layout.simple_spinner_item, android.R.id.text1);
         busSelectorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         bus_selector.setAdapter(busSelectorAdapter);
 
