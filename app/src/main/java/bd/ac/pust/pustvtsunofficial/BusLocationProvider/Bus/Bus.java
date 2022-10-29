@@ -45,7 +45,7 @@ public class Bus {
         JSONObject time=jsonObject.getJSONObject("time");
 
         Map<Date,JSONObject> bst=new HashMap<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a",Locale.ROOT);
         ArrayList <Date> arrayList=new ArrayList();
         for (Iterator<String> it = time.keys(); it.hasNext(); ) {
             String t = it.next();
@@ -110,7 +110,7 @@ public class Bus {
         JSONObject time=jsonObject.getJSONObject("time");
 
         Map<Date,JSONObject> bst=new HashMap<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a",Locale.ROOT);
         ArrayList <Date> arrayList=new ArrayList();
         for (Iterator<String> it = time.keys(); it.hasNext(); ) {
             String t = it.next();

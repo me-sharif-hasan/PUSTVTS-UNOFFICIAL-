@@ -57,8 +57,11 @@ public class VehiclesInfoBottomSheet extends BottomSheetDialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        return inflater.inflate(R.layout.fragment_vehicles_info_bottom_sheet, container, false);
+        try {
+            return inflater.inflate(R.layout.fragment_vehicles_info_bottom_sheet, container, false);
+        }catch (Exception e){
+            return null;
+        }
     }
 
     @Override
@@ -69,10 +72,6 @@ public class VehiclesInfoBottomSheet extends BottomSheetDialogFragment {
         vType = view.findViewById(R.id.tv_bottom_sheet_vehicle_type);
         road = view.findViewById(R.id.tv_bottom_sheet_road);
         stime = view.findViewById(R.id.tv_bottom_sheet_next_start_time);
-        lastupdate = view.findViewById(R.id.tv_bottom_sheet_last_update);
-        prevStopage = view.findViewById(R.id.tv_bottom_sheet_last_pass_location);
-        prevStopagePassTime = view.findViewById(R.id.tv_bottom_sheet_last_pass_time);
-        enggOn = view.findViewById(R.id.cl_while_engg_on);
         enggOff = view.findViewById(R.id.cl_while_engg_off);
         ImageView imgv3=view.findViewById(R.id.imageView3);
 
