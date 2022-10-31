@@ -13,18 +13,6 @@ import bd.ac.pust.pustvtsunofficial.MainActivity;
 
 public class Config {
     private Config(){
-        busMapper.put("students",new ArrayList<>());
-        busMapper.put("teachers",new ArrayList<>());
-
-        busMapper.get("students").add(new BusInfo("N/A","SHOW ALL","N?A"));
-        busMapper.get("students").add(new BusInfo("0351510093645193","BUS 1 (BOYS)","Ananta Bazar - Shohor - Meril - Campus"));
-        busMapper.get("students").add(new BusInfo("0351510093643297","BUS 2 (BOYS)","Ananta Bazar - Shohor - Meril - Campus"));
-        busMapper.get("students").add(new BusInfo("0351510093647488","BUS 3 (BOYS)","Ananta Bazar - Shohor - Meril - Campus"));
-        busMapper.get("students").add(new BusInfo("0351510093648122","BUS 4 (BOYS)","Ananta Bazar - Shohor - Meril - Campus"));
-        busMapper.get("students").add(new BusInfo("0351510093645326","BUS 6 (BOYS)","Ananta Bazar - Shohor - Meril - Campus"));
-        busMapper.get("students").add(new BusInfo("0351510093645268","BUS 7 (BOYS)","Ananta Bazar - Shohor - Meril - Campus"));
-        busMapper.get("students").add(new BusInfo("0351510093648080","BUS 8 (BOYS)","Ananta Bazar - Shohor - Meril - Campus"));
-        busMapper.get("students").add(new BusInfo("0351510093646084","BUS 9 (BOYS)","Ananta Bazar - Shohor - Meril - Campus"));
 
     }
     private Activity mainContext;

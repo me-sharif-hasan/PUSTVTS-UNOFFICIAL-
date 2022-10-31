@@ -13,6 +13,8 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
+
 public class StoppageManager {
     private static StoppageManager stoppageManager;
     private StoppageManager(){
@@ -34,7 +36,8 @@ public class StoppageManager {
     private final Map<String,LatLng> stoppages =new HashMap<>();
     public void load() throws Exception{
         Log.d("II_NETDUMP","COLLECTING BUS DATA");
-        URL u=new URL("https://raw.githubusercontent.com/me-sharif-hasan/blog-content/main/stoppage.txt");
+        String userName= TrackerConfig.getUserAndPass()[0];
+        URL u=new URL("https://raw.githubusercontent.com/me-sharif-hasan/blog-content/main/stoppage"+userName+".txt");
         HttpsURLConnection httpsURLConnection= (HttpsURLConnection) u.openConnection();
         httpsURLConnection.setConnectTimeout(1000);
         httpsURLConnection.connect();
