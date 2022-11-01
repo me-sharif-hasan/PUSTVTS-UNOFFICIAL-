@@ -222,7 +222,6 @@ public class BusLocatorActivity extends AppCompatActivity {
                                     TrackerConfig.deleteUserAndPass();
                                     Toast.makeText(BusLocatorActivity.this,"Logout successful",
                                             Toast.LENGTH_LONG).show();
-                                    finishAffinity();
                                     System.exit(0);
                                 } catch (Exception e) {
                                     Toast.makeText(BusLocatorActivity.this,"Logout unsuccessful",

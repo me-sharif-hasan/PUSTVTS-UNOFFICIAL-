@@ -70,6 +70,9 @@ public class LoginActivity extends AppCompatActivity {
                             });
                             BusFactory.checkUsernamePassword(usr,pass);
                             TrackerConfig.updateUserAndPass(usr,pass);
+                            try {
+                                TimeUnit.MILLISECONDS.sleep(500);
+                            }catch (Exception e){}
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
