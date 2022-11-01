@@ -37,7 +37,7 @@ public class StoppageManager {
     public void load() throws Exception{
         Log.d("II_NETDUMP","COLLECTING BUS DATA");
         String userName= TrackerConfig.getUserAndPass()[0];
-        URL u=new URL("https://raw.githubusercontent.com/me-sharif-hasan/blog-content/main/stoppage"+userName+".txt");
+        URL u=new URL("https://raw.githubusercontent.com/me-sharif-hasan/blog-content/main/stoppage-"+userName+".txt");
         HttpsURLConnection httpsURLConnection= (HttpsURLConnection) u.openConnection();
         httpsURLConnection.setConnectTimeout(1000);
         httpsURLConnection.connect();

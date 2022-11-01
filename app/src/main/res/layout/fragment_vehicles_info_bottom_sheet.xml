@@ -71,10 +71,11 @@
 
     <TextView
         android:id="@+id/tv_bottom_sheet_road"
-        android:layout_width="280dp"
+        android:layout_width="0dp"
         android:layout_height="49dp"
         android:background="@drawable/four_side_round"
         android:backgroundTint="#00FFFFFF"
+        android:fadeScrollbars="true"
         android:gravity="center_vertical"
         android:paddingLeft="0dp"
         android:paddingTop="8dp"
