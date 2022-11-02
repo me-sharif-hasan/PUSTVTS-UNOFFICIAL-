@@ -37,12 +37,14 @@ public class StoppageManager {
     public void load() throws Exception{
         Log.d("II_NETDUMP","COLLECTING BUS DATA");
         String userName= TrackerConfig.getUserAndPass()[0];
-        URL u=new URL("https://raw.githubusercontent.com/me-sharif-hasan/blog-content/main/stoppage-"+userName+".txt");
+        URL u=new URL("https://raw.githubusercontent.com/me-sharif-hasan/blog-content/main/" +
+                "stoppage-"+userName+".txt");
         HttpsURLConnection httpsURLConnection= (HttpsURLConnection) u.openConnection();
         httpsURLConnection.setConnectTimeout(1000);
         httpsURLConnection.connect();
         Log.d("II_STOP","CONNECTED");
-        BufferedReader is=new BufferedReader(new InputStreamReader(httpsURLConnection.getInputStream(),StandardCharsets.UTF_8));
+        BufferedReader is=new BufferedReader(new InputStreamReader(httpsURLConnection.
+                getInputStream(),StandardCharsets.UTF_8));
         Log.d("II_STOP","READING");
         char []buff=new char[1024];
         int l=is.read(buff);

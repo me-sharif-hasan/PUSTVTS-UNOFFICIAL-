@@ -67,7 +67,7 @@ public class BusNavigationController extends AppCompatActivity implements View.O
         logout = findViewById(R.id.ll_nav_logout);
         bottomShow = findViewById(R.id.bus_name_show);
         stoppedInfo = findViewById(R.id.stopage_name);
-        busChoose=findViewById(R.id.bus_selector);
+        //busChoose=findViewById(R.id.bus_selector);
     }
 
     private void addEventListener(){
