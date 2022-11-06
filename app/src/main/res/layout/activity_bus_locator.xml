@@ -40,7 +40,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:background="@color/near_transparent"
+            android:background="@color/near_white_t"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -56,38 +56,46 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/bus_name_show"
-                android:layout_width="108dp"
-                android:layout_height="27dp"
-                android:layout_marginStart="24dp"
-                android:text="Loading..."
-                app:layout_constraintBottom_toBottomOf="@+id/iv_dashboard"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/iv_dashboard"
-                app:layout_constraintTop_toTopOf="@+id/iv_dashboard" />
-
-            <TextView
-                android:id="@+id/stopage_name"
-                android:layout_width="113dp"
-                android:layout_height="27dp"
+            <ProgressBar
+                android:id="@+id/bus_loding_indication"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.12"
-                app:layout_constraintStart_toEndOf="@+id/bus_name_show"
+                app:layout_constraintEnd_toEndOf="@+id/bus_solo_view"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Switch
                 android:id="@+id/bus_solo_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:checked="false"
                 android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/stopage_name"
-                app:layout_constraintTop_toTopOf="parent"
-                android:checked="false"/>
+                app:layout_constraintStart_toEndOf="@+id/info_show"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/bus_name_show"
+                android:layout_width="108dp"
+                android:layout_height="27dp"
+                android:layout_marginTop="5dp"
+                android:text="Loading..."
+                app:layout_constraintBottom_toBottomOf="@+id/iv_dashboard"
+                app:layout_constraintStart_toEndOf="@+id/iv_dashboard"
+                app:layout_constraintTop_toTopOf="@+id/iv_dashboard" />
+
+            <TextView
+                android:id="@+id/additional_info"
+                android:layout_width="113dp"
+                android:layout_height="27dp"
+                android:text=""
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.12"
+                app:layout_constraintStart_toEndOf="@+id/bus_name_show"
+                app:layout_constraintTop_toTopOf="parent" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

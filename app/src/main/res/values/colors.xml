@@ -6,4 +6,5 @@
     <color name="transparent">#00FFFFFF</color>
     <color name="gray">#494949</color>
     <color name="near_transparent">#3BFFFFFF</color>
+    <color name="near_white_t">#99FFFFFF</color>
 </resources>

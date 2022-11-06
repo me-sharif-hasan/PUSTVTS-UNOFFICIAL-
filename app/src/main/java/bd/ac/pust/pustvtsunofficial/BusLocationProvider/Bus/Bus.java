@@ -23,7 +23,7 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.Interfaces.BusTr
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerFactory;
 
-public class Bus {
+public class Bus implements Comparable{
     private final String busId;
     private final String busName;
     private final String busRoute;
@@ -104,6 +104,10 @@ public class Bus {
         setBusLon(lon);
         return locationData;
     }
+    public void whereAreYou(UpdateActionListener u) throws Exception {
+        whereAreYou();
+        u.setLocationUpdateInterval(this);
+    }
     public String getStartTime(boolean returnCurrent) throws Exception{
         BusInformationFactory bif=BusInformationFactory.initiate();
         JSONObject jsonObject=bif.getBusInfo(busId);
@@ -162,6 +166,7 @@ public class Bus {
     }
 
     public boolean getEngineStatus(){
+        if(getBusName().equals("ALL")) busEngineStatus=false;
         return busEngineStatus;
     }
     public void setUpdateInterval(UpdateActionListener e,long interval){
@@ -177,6 +182,13 @@ public class Bus {
             }
         }).start();
     }
+
+    @Override
+    public int compareTo(Object o) {
+        Bus b=(Bus) o;
+        return getBusName().compareTo(b.getBusName());
+    }
+
     public interface UpdateActionListener{
         void setLocationUpdateInterval(Bus context);
     }

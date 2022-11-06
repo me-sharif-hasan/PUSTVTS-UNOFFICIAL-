@@ -53,15 +53,15 @@
                     android:src="@mipmap/bus_icon" />
 
                 <TextView
-                    android:id="@+id/textView"
+                    android:id="@+id/bus_picker"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:padding="8dp"
-                    android:text="Vehicles"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:textStyle="normal" />
+                    android:textStyle="normal"
+                    android:text="বাস লিস্ট"/>
 
 
             </LinearLayout>

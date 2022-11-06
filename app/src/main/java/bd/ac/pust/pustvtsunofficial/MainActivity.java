@@ -1,12 +1,15 @@
 package bd.ac.pust.pustvtsunofficial;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.CookieAndSession.CookieManger;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInformationFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
+import bd.ac.pust.pustvtsunofficial.Updater.AppUpdater;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
@@ -32,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
         Config.getInstance().setMainContext(this);
         retry=findViewById(R.id.retry);
         pb=findViewById(R.id.progressBar);
-
 
         //Creating buses
         retry.setOnClickListener(new View.OnClickListener() {

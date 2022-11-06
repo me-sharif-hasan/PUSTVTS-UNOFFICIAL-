@@ -17,7 +17,7 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 import bd.ac.pust.pustvtsunofficial.Maps.MapController;
 
-public class BusNavigationController extends AppCompatActivity implements View.OnClickListener, BusFactory.BusLoadListener {
+public class BusNavigationControfllerc extends AppCompatActivity implements View.OnClickListener, BusFactory.BusLoadListener {
     FrameLayout bus_finder;
     ImageView dashboard;
     DrawerLayout drawerLayout;
@@ -66,7 +66,7 @@ public class BusNavigationController extends AppCompatActivity implements View.O
         help = findViewById(R.id.ll_nav_help);
         logout = findViewById(R.id.ll_nav_logout);
         bottomShow = findViewById(R.id.bus_name_show);
-        stoppedInfo = findViewById(R.id.stopage_name);
+        stoppedInfo = findViewById(R.id.info_show);
         //busChoose=findViewById(R.id.bus_selector);
     }
 

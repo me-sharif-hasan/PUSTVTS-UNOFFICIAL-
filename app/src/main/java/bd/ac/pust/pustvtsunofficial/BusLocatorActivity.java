@@ -17,15 +17,13 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.NavDrawer.Vehicl
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
-import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInformationFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.StoppageManager.StoppageManager;
 import bd.ac.pust.pustvtsunofficial.Maps.MapController;
+import bd.ac.pust.pustvtsunofficial.Updater.AppUpdater;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.nfc.Tag;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,11 +31,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -45,23 +43,20 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.material.tabs.TabLayout;
-
-import org.jsoup.select.Evaluator;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.concurrent.TimeUnit;
 
 public class BusLocatorActivity extends AppCompatActivity {
     FrameLayout bus_finder;
     ImageView dashboard;
     static DrawerLayout drawerLayout;
-    LinearLayout vehicles,stoppages,add_alearm,help,logout;
+    LinearLayout vehicles, stoppages, add_alearm, help, logout;
 
-    TextView bottomShow,stopedInfo;
+    TextView bottomShow, stopedInfo;
     RecyclerView vehicleRV;
     ArrayList<Bus> vehicleList;
-    boolean vehiclesDataShow,stopageDataShow;
+    boolean vehiclesDataShow, stopageDataShow;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -70,6 +65,8 @@ public class BusLocatorActivity extends AppCompatActivity {
         //ensure bus information is loaded;
         mpc.setContext(this);
         setContentView(R.layout.activity_bus_locator);
+
+
         bus_finder = findViewById(R.id.fl_fragmentHolder);
         dashboard = findViewById(R.id.iv_dashboard);
         drawerLayout = findViewById(R.id.dl_bus_locator);
@@ -80,18 +77,87 @@ public class BusLocatorActivity extends AppCompatActivity {
         logout = findViewById(R.id.ll_nav_logout);
 
         bottomShow = findViewById(R.id.bus_name_show);
-        stopedInfo = findViewById(R.id.stopage_name);
+        stopedInfo = findViewById(R.id.additional_info);
 
         vehicleRV = findViewById(R.id.rv_vehicles);
+
+
+
+
+        AppUpdater.getInstance().checkUpdate(new AppUpdater.UpdateCheckListener() {
+            @Override
+            public void onUpdateAvailable(String url, int availableV) {
+                Log.d("II_UPDATE", url);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        new AlertDialog.Builder(BusLocatorActivity.this)
+                                .setIcon(R.drawable.ic_logout)
+                                .setTitle("New update available!")
+                                .setMessage("Version code:"+availableV+", Want to update to the newer version?")
+                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        stopedInfo.setText("Getting update ready.");
+                                        AppUpdater.getInstance().downloadAndUpdate(url, BusLocatorActivity.this, new AppUpdater.UpdateProgress() {
+                                            double cmls=0;
+                                            @Override
+                                            public void onDownloadData(long size) {
+                                                cmls+=size;
+                                                float mb= (float) (cmls/(1024*1024.0));
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        BusLocatorActivity.this.stopedInfo.setText(String.format("%.1f",mb)+" MB");
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onComplete() {
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        BusLocatorActivity.this.stopedInfo.setText("Update downloaded!");
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onError(String localizedMessage) {
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        BusLocatorActivity.this.stopedInfo.setText(localizedMessage);
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                })
+                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                    }
+                                }).show();
+                    }
+                });
+            }
+        });
+
+
+
+
+
+        ProgressBar progressBar = findViewById(R.id.bus_loding_indication);
         vehicleList = new ArrayList<>();
 
 
+        Spinner stoppage_selector = findViewById(R.id.stoppage_selector);
 
 
-        Spinner stoppage_selector=findViewById(R.id.stoppage_selector);
-
-
-        Switch isolator=findViewById(R.id.bus_solo_view);
+        Switch isolator = findViewById(R.id.bus_solo_view);
         isolator.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,27 +165,6 @@ public class BusLocatorActivity extends AppCompatActivity {
                 mpc.isolateView(isolator);
             }
         });
-
-//        //Spinner bus_selector=findViewById(R.id.bus_selector);
-//        ArrayAdapter<String> busSelectorAdapter = new ArrayAdapter<String>(this, android.R.layout.
-//                simple_spinner_item, android.R.id.text1);
-//        busSelectorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//
-//
-//        bus_selector.setAdapter(busSelectorAdapter);
-//
-//        bus_selector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-//                mpc.selectBusId(i);
-//                closeDrawer();
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> adapterView) {
-//
-//            }
-//        });
 
         ArrayAdapter<String> stoppageSelectorAdapter = new ArrayAdapter<String>(this, android.R.
                 layout.simple_spinner_item, android.R.id.text1);
@@ -136,20 +181,21 @@ public class BusLocatorActivity extends AppCompatActivity {
                         stoppageSelectorAdapter.notifyDataSetChanged();
                     }
                 });
-                mpc.addStoppage(stoppageName,l);
+                mpc.addStoppage(stoppageName, l);
                 mpc.notifyStoppageChange();
             }
         });
 
         stoppage_selector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            boolean first=true;
+            boolean first = true;
+
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if(first){
-                    first=false;
+                if (first) {
+                    first = false;
                     return;
                 }
-                TextView t= (TextView) view;
+                TextView t = (TextView) view;
                 Log.d("II_420", (String) t.getText());
                 try {
                     mpc.isolateStoppage((String) t.getText());
@@ -165,30 +211,23 @@ public class BusLocatorActivity extends AppCompatActivity {
             }
         });
 
+        VehicleAdapter vadapter = new VehicleAdapter(this, vehicles);
+        vehicleRV.setAdapter(vadapter);
+        LinearLayoutManager llm = new LinearLayoutManager(BusLocatorActivity.this);
+        vehicleRV.setLayoutManager(llm);
+
         dashboard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    vehicleList.sort(new Comparator<Bus>() {
-                        @Override
-                        public int compare(Bus bus, Bus t1) {
-                            return bus.getBusName().compareTo(t1.getBusName());
-                        }
-                    });
-                }
-                VehicleAdapter vadapter = new VehicleAdapter(BusLocatorActivity.this,vehicleList);
-                vehicleRV.setAdapter(vadapter);
-                LinearLayoutManager llm = new LinearLayoutManager(BusLocatorActivity.this);
-                vehicleRV.setLayoutManager(llm);
                 vehicleRV.setVisibility(View.GONE);
                 vehiclesDataShow = false;
-
+                vadapter.notifyDataSetChanged();
                 openDrower();
 
             }
         });
 
-        ImageButton recenter=findViewById(R.id.recenter);
+        ImageButton recenter = findViewById(R.id.recenter);
         recenter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -199,64 +238,57 @@ public class BusLocatorActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    BusFactory.setBusLoadListener(new BusFactory.BusLoadListener() {
-                        @Override
-                        public void onBusLoaded(Bus bus, int busKey) {
-                            vehicleList.add(bus);
-
-                            Log.d("II_077",bus.getBusId());
-                            BusLocatorActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    String ind = bus.getBusName() + " ";
-                                    try {
-                                        String busType = bus.getBusType();
-                                        String busRoute = bus.getBusRoute();
-                                        ind += " [" + busType + "] \uD83D\uDE8F " + busRoute;
-                                        Log.d("II_YB", busType);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                        Log.e("II_08", e.getLocalizedMessage());
-                                    }
-                                    //busSelectorAdapter.add(ind);
-                                    //busSelectorAdapter.sort(new Comparator<String>() {
-//                                        @Override
-//                                        public int compare(String s, String t1) {
-//                                            return s.compareTo(t1);
-//                                        }
-//                                    });
-//                                    busSelectorAdapter.notifyDataSetChanged();
+                while (true) {
+                    try {
+                        BusFactory.createBusList(new BusFactory.BusCreatedEvent() {
+                            @Override
+                            public void onBusCreated(Bus bus) {
+                                Log.d("II_890", bus.getBusName());
+                                if (!bottomShow.getText().toString().equals("Showing All")) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Log.d("II_909", "ENTERING");
+                                            bottomShow.setText("Showing All");
+                                            progressBar.setVisibility(View.GONE);
+                                        }
+                                    });
                                 }
-                            });
+                                vadapter.addBus(bus);
+                            }
+                        });
+                        break;
+                    } catch (Exception e) {
+                        try {
+                            TimeUnit.MILLISECONDS.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            ex.printStackTrace();
                         }
-                    });
-                    BusFactory.createBusList(null);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    }
                 }
             }
         }).start();
 
+
         vehicles.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(vehiclesDataShow){
+                if (vehiclesDataShow) {
                     vehicleRV.setVisibility(View.GONE);
                     vehiclesDataShow = false;
-                }else{
+                } else {
                     vehicleRV.setVisibility(View.VISIBLE);
                     vehiclesDataShow = true;
                 }
-
-                Toast.makeText(BusLocatorActivity.this, "vehicle clicked" +
-                        "", Toast.LENGTH_SHORT).show();
+//
+//                Toast.makeText(BusLocatorActivity.this, "vehicle clicked" +
+//                        "", Toast.LENGTH_SHORT).show();
             }
         });
         add_alearm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i=new Intent(BusLocatorActivity.this, AlarmActivity.class);
+                Intent i = new Intent(BusLocatorActivity.this, AlarmActivity.class);
                 startActivity(i);
             }
         });
@@ -274,11 +306,11 @@ public class BusLocatorActivity extends AppCompatActivity {
                                 try {
                                     CookieManger.getInstance().clearCookies();
                                     TrackerConfig.deleteUserAndPass();
-                                    Toast.makeText(BusLocatorActivity.this,"Logout successful",
+                                    Toast.makeText(BusLocatorActivity.this, "Logout successful",
                                             Toast.LENGTH_LONG).show();
                                     System.exit(0);
                                 } catch (Exception e) {
-                                    Toast.makeText(BusLocatorActivity.this,"Logout unsuccessful",
+                                    Toast.makeText(BusLocatorActivity.this, "Logout unsuccessful",
                                             Toast.LENGTH_LONG).show();
                                 }
                                 closeDrawer();
@@ -302,7 +334,7 @@ public class BusLocatorActivity extends AppCompatActivity {
         });
 
         FragmentTransaction manager = getSupportFragmentManager().beginTransaction();
-        manager.replace(bus_finder.getId(),new MapInflation()).commit();
+        manager.replace(bus_finder.getId(), new MapInflation()).commit();
 
     }
 
@@ -310,12 +342,12 @@ public class BusLocatorActivity extends AppCompatActivity {
         drawerLayout.openDrawer(GravityCompat.START);
     }
 
-    public void BusIC_clickListener(View view){
+    public void BusIC_clickListener(View view) {
         closeDrawer();
     }
 
-    public static void closeDrawer(){
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+    public static void closeDrawer() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         }
     }
@@ -326,7 +358,8 @@ public class BusLocatorActivity extends AppCompatActivity {
         closeDrawer();
     }
 
-    public static MapController mpc=new MapController();
+    public static MapController mpc = new MapController();
+
     public static class MapInflation extends Fragment {
 
         @Override
@@ -343,7 +376,7 @@ public class BusLocatorActivity extends AppCompatActivity {
         @Override
         public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
-            SupportMapFragment mapFragment= (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+            SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
             assert mapFragment != null;
             mapFragment.getMapAsync(mpc);
         }
