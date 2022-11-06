@@ -37,13 +37,13 @@ public class LocationPermissionChecker {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
-                Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onPermissionDenied(List<String> deniedPermissions) {
-                Toast.makeText(context, "Permission Denied\n" + deniedPermissions.toString(),
-                        Toast.LENGTH_SHORT).show();
+                /*Toast.makeText(context, "Permission Denied\n" + deniedPermissions.toString(),
+                        Toast.LENGTH_SHORT).show();*/
             }
         };
 

@@ -1,6 +1,7 @@
 package bd.ac.pust.pustvtsunofficial.Helper;
 
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import bd.ac.pust.pustvtsunofficial.R;
@@ -58,7 +60,7 @@ public class VehiclesInfoBottomSheet extends BottomSheetDialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         try {
-            return inflater.inflate(R.layout.fragment_vehicles_info_bottom_sheet, container, false);
+            return inflater.inflate(R.layout.fragment_vehicles_info_bottom_sheet, container, true);
         }catch (Exception e){
             return null;
         }
@@ -67,10 +69,10 @@ public class VehiclesInfoBottomSheet extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         vName = view.findViewById(R.id.tv_bottom_sheet_vehicle_name);
         vType = view.findViewById(R.id.tv_bottom_sheet_vehicle_type);
         road = view.findViewById(R.id.tv_bottom_sheet_road);
+        road.setMovementMethod(new ScrollingMovementMethod());
         stime = view.findViewById(R.id.tv_bottom_sheet_next_start_time);
         enggOff = view.findViewById(R.id.cl_while_engg_off);
         ImageView imgv3=view.findViewById(R.id.imageView3);

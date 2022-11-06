@@ -102,7 +102,7 @@ public abstract class TrackerConfig {
     public static SSLSocket getSSLSocketForSimulation() throws IOException {
         SSLSocketFactory sslSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
         SSLSocket sslSocket = (SSLSocket) sslSocketFactory.createSocket();
-        sslSocket.connect(new InetSocketAddress("pustvts.com", 443), 4000);
+        sslSocket.connect(new InetSocketAddress("pustvts.com", 443), 1000);
         sslSocket.startHandshake();
         return sslSocket;
     }

@@ -1,12 +1,12 @@
 package bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.NavDrawer;
 
-import static bd.ac.pust.pustvtsunofficial.R.layout.recycler_view_sample_desing;
-
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,6 +14,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
 import bd.ac.pust.pustvtsunofficial.BusLocatorActivity;
@@ -21,13 +23,21 @@ import bd.ac.pust.pustvtsunofficial.R;
 
 public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.viewHolder>{
     Context context;
-    ArrayList<Bus> list;
+    ArrayList<Bus> list=new ArrayList<>();
+    LinearLayout l;
 
-    public VehicleAdapter(final Context context, final ArrayList<Bus> list) {
+    public VehicleAdapter(final Context context, LinearLayout vehicles) {
+        l=vehicles;
         this.context = context;
-        this.list = list;
     }
 
+    public ArrayList<Bus> getBusList(){
+        return list;
+    }
+    public synchronized void addBus(Bus b){
+        list.add(b);
+        Collections.sort(list);
+    }
     @NonNull
     @Override
     public viewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -37,29 +47,36 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.viewHold
     }
 
     @Override
-    public void onBindViewHolder(@NonNull viewHolder holder, int position) {
+    public synchronized void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Bus bus = list.get(position);
         int i = position;
         holder.vehicleName.setText(bus.getBusName());
         try {
             holder.vehicleType.setText("[ "+bus.getBusType()+" ]");
         } catch (Exception e) {
-            holder.vehicleType.setText("[ N/A ]");
+            holder.vehicleType.setText("প্রযোজ্য নয়");
         }
         try {
             holder.vehicleRoad.setText(bus.getBusRoute());
         } catch (Exception e) {
-            holder.vehicleRoad.setText("Not find.");
+            holder.vehicleRoad.setText("প্রযোজ্য নয়");
         }
-        if(bus.getEngineStatus()) {
-            holder.statusColor.setBackgroundColor(Color.parseColor("#4CAF50"));
-        }else{
-            holder.statusColor.setBackgroundColor(Color.parseColor("#FF5722"));
-        }
+        bus.setUpdateInterval(new Bus.UpdateActionListener() {
+            @Override
+            public void setLocationUpdateInterval(Bus context) {
+                if (context.getEngineStatus()) {
+                    holder.statusColor.setBackgroundColor(Color.GREEN);
+                } else {
+                    holder.statusColor.setBackgroundColor(Color.RED);
+                }
+            }
+        },1000);
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BusLocatorActivity.mpc.selectBusId(i);
+                TextView t=l.findViewById(R.id.bus_picker);
+                t.setText(bus.getBusName());
+                BusLocatorActivity.mpc.selectBusId(bus.getBusId());
                 BusLocatorActivity.closeDrawer();
             }
         });
@@ -81,6 +98,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.viewHold
             vehicleType = itemView.findViewById(R.id.tv_vehicle_vehicle_type);
             vehicleRoad = itemView.findViewById(R.id.tv_vehicle_road);
             statusColor = itemView.findViewById(R.id.v_vehicle_status_color);
+            statusColor.setBackgroundColor(Color.TRANSPARENT);
         }
     }
 }

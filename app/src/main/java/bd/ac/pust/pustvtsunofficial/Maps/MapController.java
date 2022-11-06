@@ -1,19 +1,23 @@
 package bd.ac.pust.pustvtsunofficial.Maps;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.location.LocationManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -21,6 +25,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +39,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
+import bd.ac.pust.pustvtsunofficial.Helper.LocationPermissionChecker;
 import bd.ac.pust.pustvtsunofficial.Helper.VehiclesInfoBottomSheet;
 import bd.ac.pust.pustvtsunofficial.R;
 
@@ -42,7 +48,7 @@ public class MapController implements OnMapReadyCallback {
     Map<String, Marker> markerMap=new HashMap<>();
     Map<String,Boolean> updateState=new HashMap<>();
     Map <Integer,Bus> buses=null;
-    double ZOOM_LEVEL=19;
+    double ZOOM_LEVEL=18;
     boolean willZoom=true;
     boolean willAutoFocus=false;
     String focusedBus="";
@@ -59,6 +65,32 @@ public class MapController implements OnMapReadyCallback {
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         gmap=googleMap;
+        LocationPermissionChecker locationPermissionChecker=new LocationPermissionChecker(context);
+        if(locationPermissionChecker.checkPermission()){
+            final LocationManager manager = (LocationManager) context.getSystemService( Context.LOCATION_SERVICE );
+            if ( manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+                googleMap.setMyLocationEnabled(true);
+                googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+                googleMap.getUiSettings().setCompassEnabled(true);
+
+                View locationButton = ((View) context.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+                //locationButton.setVisibility(View.GONE);
+                RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+                // position on right bottom
+                rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+                rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                rlp.setMargins(0, 180, 180, 200);
+
+                View compass = ((View) context.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("5"));
+                //locationButton.setVisibility(View.GONE);
+                rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+                // position on right bottom
+                rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+                rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                rlp.setMargins(0, 180, 180, 400);
+            }
+        }
+
         notifyStoppageChange();
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -112,7 +144,7 @@ public class MapController implements OnMapReadyCallback {
     }
     GoogleMap gmap;
 
-    Map <Integer,Bus> busIdList=new HashMap<>();
+    Map <String,Bus> busIdList=new HashMap<>();
 
 
     public void startUpdate2(GoogleMap gmap){
@@ -122,13 +154,14 @@ public class MapController implements OnMapReadyCallback {
         BusFactory.setBusLoadListener(new BusFactory.BusLoadListener() {
             @Override
             public void onBusLoaded(Bus bus,int busKey) {
-                busIdList.put(busKey,bus);
+                busIdList.put(bus.getBusId(),bus);
                 if(bus.getBusId().equals("N/A")) return;
                 bus.setUpdateInterval(new Bus.UpdateActionListener(){
                     boolean currentColor=true;
                     @Override
                     public void setLocationUpdateInterval(Bus targetBus) {
                         try {
+                            Log.d("II_INIT_MARKERS","TRY");
                             if(!focusedBus.equals(targetBus.getBusId())&&hide) return;
                             targetBus.whereAreYou();
                             double lon = targetBus.getBusLon();
@@ -168,6 +201,7 @@ public class MapController implements OnMapReadyCallback {
                                     }
                                 });
                             }else{
+                                Log.d("II_INIT_MARKER","INITIATING MARKERS");
                                 MarkerOptions markerOptions=createNewMarker(lon,lat);
                                 markerOptions.icon(BitmapDescriptorFactory.fromBitmap(markerIcon));
                                 markerOptions.title(targetBus.getBusName());
@@ -194,7 +228,15 @@ public class MapController implements OnMapReadyCallback {
             }
         });
     }
-
+    public void clearMarkers(){
+        for(String m:markerMap.keySet()){
+            Marker mar=markerMap.get(m);
+            mar.remove();
+        }
+        markerOptionsMap.clear();
+        markerMap.clear();
+        Log.d("II_INIT","WINDOW RESIZED");
+    }
 
     private void focus(LatLng latLng){
         if(gmap==null||context==null) return;
@@ -216,13 +258,10 @@ public class MapController implements OnMapReadyCallback {
         }
     }
 
-    public void selectBusId(int i) {
-        Log.e("II_ERR", i +" "+busIdList.size());
-        if(busIdList==null||!busIdList.containsKey(i)||gmap==null) return;
+    public void selectBusId(String busId){
         TextView tv=context.findViewById(R.id.bus_name_show);
-        Log.i("II_CHECK","BUS SELECTED "+i+" "+"OKAY ");
+        Log.i("II_CHECK","BUS SELECTED "+busId+" "+"OKAY ");
         @SuppressLint("UseSwitchCompatOrMaterialCode") Switch soloView=context.findViewById(R.id.bus_solo_view);
-        String busId= Objects.requireNonNull(busIdList.get(i)).getBusId();
         if(busId.equals("N/A")){
             willAutoFocus=false;
             focusedBus="";
@@ -232,12 +271,12 @@ public class MapController implements OnMapReadyCallback {
             soloView.setVisibility(View.INVISIBLE);
             return;
         }
-        Log.i("II_CHECK","BUS SELECTED "+i+" "+busId);
+        Log.i("II_CHECK","BUS SELECTED "+busId+" "+busId);
         if(!markerMap.containsKey(busId)){
             Toast.makeText(context, "This bus is not loaded yet!", Toast.LENGTH_SHORT).show();
             return;
         }
-        tv.setText(Objects.requireNonNull(busIdList.get(i)).getBusName());
+        tv.setText(Objects.requireNonNull(busIdList.get(busId)).getBusName());
         //Ignore focus flag
         Objects.requireNonNull(markerMap.get(busId)).setVisible(true);
         focusedBus=busId;
@@ -247,6 +286,13 @@ public class MapController implements OnMapReadyCallback {
         isolateView(soloView);
         markerMap.get(busId).showInfoWindow();
         focus(Objects.requireNonNull(markerMap.get(busId)).getPosition());
+    }
+
+    public void selectBusId(int i) {
+        Log.e("II_ERR", i +" "+busIdList.size());
+        if(busIdList==null||!busIdList.containsKey(i)||gmap==null) return;
+        String busId= Objects.requireNonNull(busIdList.get(i)).getBusId();
+        selectBusId(busId);
     }
     public void isolateView(Switch sw){
         Log.d("II_SWITCH", String.valueOf(sw.isChecked()));

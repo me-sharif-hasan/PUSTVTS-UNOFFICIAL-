@@ -9,6 +9,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -19,7 +22,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Design.Light.NoActionBar"
         android:usesCleartextTraffic="true"
+        android:resizeableActivity="false"
         tools:targetApi="31">
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="ir.greencode"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/path" />
+        </provider>
         <receiver android:name=".Alarm.AlarmReceiver" />
         <activity
             android:name=".Alarm.AlarmActivity"
@@ -31,10 +44,6 @@
         </activity>
         <activity
             android:name=".BusLocatorActivity"
-            android:exported="false"
-            android:label="@string/title_activity_bus_finder" />
-        <activity
-            android:name=".BusNavigationController"
             android:exported="false"
             android:label="@string/title_activity_bus_finder" />
         <activity
