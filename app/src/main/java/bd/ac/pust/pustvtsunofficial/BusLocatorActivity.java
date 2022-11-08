@@ -25,6 +25,7 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,7 +57,7 @@ public class BusLocatorActivity extends AppCompatActivity {
     TextView bottomShow, stopedInfo;
     RecyclerView vehicleRV;
     ArrayList<Bus> vehicleList;
-    boolean vehiclesDataShow, stopageDataShow;
+    boolean vehiclesDataShow;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -340,7 +341,15 @@ public class BusLocatorActivity extends AppCompatActivity {
         help.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(BusLocatorActivity.this,Help.class);
+                closeDrawer();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startActivity(intent);
+                    }
+                },300);
             }
         });
     }
