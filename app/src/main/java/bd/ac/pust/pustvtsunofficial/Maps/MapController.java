@@ -83,11 +83,11 @@ public class MapController implements OnMapReadyCallback {
 
                 View compass = ((View) context.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("5"));
                 //locationButton.setVisibility(View.GONE);
-                rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+                rlp = (RelativeLayout.LayoutParams) compass.getLayoutParams();
                 // position on right bottom
                 rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                 rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-                rlp.setMargins(0, 180, 180, 400);
+                rlp.setMargins(0, 180, 180, 200);
             }
         }
 
