@@ -15,7 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.Bus;
 import bd.ac.pust.pustvtsunofficial.BusLocatorActivity;
@@ -45,10 +47,10 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.viewHold
                 parent,false);
         return new viewHolder(view);
     }
-
+    Map<Bus,Boolean> updateIntervalAdded=new HashMap<>();
     @Override
     public synchronized void onBindViewHolder(@NonNull viewHolder holder, int position) {
-        Bus bus = list.get(position);
+        final Bus bus = list.get(position);
         int i = position;
         holder.vehicleName.setText(bus.getBusName());
         try {
@@ -61,16 +63,20 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.viewHold
         } catch (Exception e) {
             holder.vehicleRoad.setText("প্রযোজ্য নয়");
         }
-        bus.setUpdateInterval(new Bus.UpdateActionListener() {
-            @Override
-            public void setLocationUpdateInterval(Bus context) {
-                if (context.getEngineStatus()) {
-                    holder.statusColor.setBackgroundColor(Color.GREEN);
-                } else {
-                    holder.statusColor.setBackgroundColor(Color.RED);
+        if(!updateIntervalAdded.containsKey(bus)) {
+            updateIntervalAdded.put(bus,true);
+
+            bus.setUpdateInterval(new Bus.UpdateActionListener() {
+                @Override
+                public void setLocationUpdateInterval(Bus context) {
+                    if (context.getEngineStatus()) {
+                        holder.statusColor.setBackgroundColor(Color.GREEN);
+                    } else {
+                        holder.statusColor.setBackgroundColor(Color.RED);
+                    }
                 }
-            }
-        },1000);
+            }, 1000);
+        }
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

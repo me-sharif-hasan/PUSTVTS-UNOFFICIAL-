@@ -29,6 +29,8 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -38,7 +40,7 @@ import java.util.Map;
 public class AlarmActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
-
+    AlarmAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,10 +49,15 @@ public class AlarmActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.rv_alarm_show);
 
         ArrayList<AlarmModel> arrayList = new ArrayList<>();
-        arrayList.add(new AlarmModel("Bus 3","02:25"));
-        arrayList.add(new AlarmModel("Bus 9","01:25"));
-        arrayList.add(new AlarmModel("Bus 3","05:10"));
-        AlarmAdapter adapter = new AlarmAdapter(AlarmActivity.this,arrayList);
+        //arrayList.add(new AlarmModel("Bus 3","02:25"));
+        //arrayList.add(new AlarmModel("Bus 9","01:25"));
+        //arrayList.add(new AlarmModel("Bus 3","05:10"));
+        try {
+            adapter = new AlarmAdapter(AlarmActivity.this,arrayList);
+        } catch (Exception e) {
+            Log.d("II_ALARM_ADAPTER_ERR",e.getLocalizedMessage());
+            e.printStackTrace();
+        }
         LinearLayoutManager layoutManager = new LinearLayoutManager(AlarmActivity.this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(layoutManager);
@@ -141,7 +148,14 @@ public class AlarmActivity extends AppCompatActivity {
         } else {
             manager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
         }
-        Toast.makeText(this, "Alarm at: " + h + ":" + m, Toast.LENGTH_LONG).show();
+        try {
+            adapter.add(new AlarmModel("Alarm #" + (adapter.getItemCount() + 1), new SimpleDateFormat("hh:mm a").format(c.getTime())));
+            adapter.notifyDataSetChanged();
+        }catch (Exception e){
+            e.printStackTrace();
+            Toast.makeText(this,e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
+        }
+        //Toast.makeText(this, "Alarm at: " + h + ":" + m, Toast.LENGTH_LONG).show();
     }
 
 }

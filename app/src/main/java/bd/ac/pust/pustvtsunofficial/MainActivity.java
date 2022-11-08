@@ -7,6 +7,7 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus.BusInformationFactory;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.StoppageManager.StoppageManager;
 import bd.ac.pust.pustvtsunofficial.Updater.AppUpdater;
 
 import android.content.DialogInterface;
@@ -82,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             if(CookieManger.getInstance().checkAllCookie()){
                 Log.d("IILOG","ALL COOKIES OKAY");
+                //StoppageManager.init();
                 Intent i=new Intent(MainActivity.this, BusLocatorActivity.class);
                 startActivity(i);
                 finish();
@@ -100,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
                         if(userAndPass!=null) {
                             BusFactory.checkUsernamePassword(userAndPass[0], userAndPass[1]);
                             Log.d("IILOG","USING AUTO LOG INX ");
+                            //StoppageManager.init();
                             Intent i=new Intent(MainActivity.this,BusLocatorActivity.class);
                             startActivity(i);
                             finish();

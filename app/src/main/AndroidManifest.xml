@@ -2,38 +2,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/bus_logo_red"
         android:label="@string/app_name"
+        android:resizeableActivity="false"
         android:roundIcon="@mipmap/bus_logo_red"
         android:supportsRtl="true"
         android:theme="@style/Theme.Design.Light.NoActionBar"
         android:usesCleartextTraffic="true"
-        android:resizeableActivity="false"
         tools:targetApi="31">
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="ir.greencode"
-            android:exported="false"
-            android:grantUriPermissions="true">
+        <activity
+            android:name=".Help"
+            android:exported="false">
             <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/path" />
-        </provider>
-        <receiver android:name=".Alarm.AlarmReceiver" />
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+
         <activity
             android:name=".Alarm.AlarmActivity"
             android:enabled="true"
@@ -42,10 +30,12 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+
         <activity
             android:name=".BusLocatorActivity"
             android:exported="false"
             android:label="@string/title_activity_bus_finder" />
+
         <activity
             android:name=".LoginActivity"
             android:exported="false">
@@ -66,10 +56,31 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="***REMOVED***" />
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="ir.greencode"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/path" />
+        </provider>
+
+        <receiver android:name=".Alarm.AlarmReceiver" />
     </application>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 </manifest>

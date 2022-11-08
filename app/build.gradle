@@ -10,8 +10,8 @@ android {
         applicationId "bd.ac.pust.pustvtsunofficial"
         minSdk 21
         targetSdk 32
-        versionCode 10 //prev 9
-        versionName "2.2" //prev 2.1
+        versionCode 12 //prev 11
+        versionName "2.3" //prev 2.2
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

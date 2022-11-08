@@ -86,7 +86,7 @@ public class BusLocatorActivity extends AppCompatActivity {
 
         AppUpdater.getInstance().checkUpdate(new AppUpdater.UpdateCheckListener() {
             @Override
-            public void onUpdateAvailable(String url, int availableV) {
+            public void onUpdateAvailable(String url, int availableV,String msg) {
                 Log.d("II_UPDATE", url);
                 runOnUiThread(new Runnable() {
                     @Override
@@ -94,7 +94,7 @@ public class BusLocatorActivity extends AppCompatActivity {
                         new AlertDialog.Builder(BusLocatorActivity.this)
                                 .setIcon(R.drawable.ic_logout)
                                 .setTitle("New update available!")
-                                .setMessage("Version code:"+availableV+", Want to update to the newer version?")
+                                .setMessage(msg)
                                 .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -171,7 +171,7 @@ public class BusLocatorActivity extends AppCompatActivity {
         //busSelectorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         stoppage_selector.setAdapter(stoppageSelectorAdapter);
         stoppageSelectorAdapter.notifyDataSetChanged();
-        StoppageManager.init().setOnStoppageLoadListener(new StoppageManager.StoppageLoadEvent() {
+        StoppageManager.init(new StoppageManager.StoppageLoadEvent() {
             @Override
             public void onStoppageCreated(String stoppageName, LatLng l) {
                 runOnUiThread(new Runnable() {
@@ -336,6 +336,13 @@ public class BusLocatorActivity extends AppCompatActivity {
         FragmentTransaction manager = getSupportFragmentManager().beginTransaction();
         manager.replace(bus_finder.getId(), new MapInflation()).commit();
 
+
+        help.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
     }
 
     private void openDrower() {

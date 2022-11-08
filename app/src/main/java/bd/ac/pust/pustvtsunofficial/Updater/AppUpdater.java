@@ -44,9 +44,13 @@ public class AppUpdater {
                     Log.d("II_VER",json);
                     int availableV=jsonObject.getInt("version_code");
                     String link=jsonObject.getString("link");
+                    String msg="Version: "+availableV;
+                    try{
+                        msg=jsonObject.getString("msg");
+                    }catch (Exception e){}
                     if(availableV>versionCode) {
                         if (updateCheckListener != null)
-                            updateCheckListener.onUpdateAvailable(link,availableV);
+                            updateCheckListener.onUpdateAvailable(link,availableV,msg);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -113,7 +117,7 @@ public class AppUpdater {
     }
 
     public interface UpdateCheckListener{
-        public void onUpdateAvailable(String url, int availableV);
+        public void onUpdateAvailable(String url, int availableV,String msg);
     }
     public interface UpdateProgress{
         public void onDownloadData(long size);

@@ -1,6 +1,7 @@
 package bd.ac.pust.pustvtsunofficial.Alarm.Adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,18 +12,69 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import bd.ac.pust.pustvtsunofficial.Alarm.Model.AlarmModel;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Config;
 import bd.ac.pust.pustvtsunofficial.R;
 
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.viewHolder>{
     Context context;
     ArrayList<AlarmModel> list;
 
-    public AlarmAdapter(final Context context, final ArrayList<AlarmModel> list) {
+    private final String ALARM_FILE = Config.getInstance().getMainContext().getFilesDir()+"alarm.ck";
+
+    Map<String,String> alarms=new HashMap<>();
+    public AlarmAdapter(final Context context, final ArrayList<AlarmModel> list) throws Exception {
+        Log.d("II_ALARM","ALARM ADAPTER RELOADED");
         this.context = context;
         this.list = list;
+        File alarmFile=new File(ALARM_FILE);
+        if(!alarmFile.exists()) alarmFile.createNewFile();
+        InputStream is=new FileInputStream(alarmFile);
+        byte []buff=new byte[1024];
+        int l=is.read(buff);
+        try {
+            String data = new String(buff, 0, l);
+            String[] alm = data.split("\n");
+            for (String salm : alm) {
+                String nm = salm.split("!")[0];
+                String tt = salm.split("!")[1];
+                alarms.put(tt, nm);
+                list.add(new AlarmModel(nm,tt));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void saveAlarm(String tt,String nm) throws Exception {
+        alarms.put(tt,nm);
+        File alarmFile=new File(ALARM_FILE);
+        if(!alarmFile.exists()) alarmFile.createNewFile();
+        FileOutputStream fileOutputStream=new FileOutputStream(ALARM_FILE,false);
+        for(String t:alarms.keySet()){
+            String n=alarms.get(t);
+            fileOutputStream.write((n+"!"+t+"\n").getBytes(StandardCharsets.UTF_8));
+        }
+        fileOutputStream.close();
+    }
+    public void add(AlarmModel alarmModel) throws Exception{
+        for(AlarmModel a:list){
+            if(a.getAlarmTime().equals(alarmModel.getAlarmTime())) throw new Exception("Alarm already exists!");
+        }
+        if(!alarms.containsKey(alarmModel.getAlarmTime())){
+            saveAlarm(alarmModel.getAlarmTime(),alarmModel.getVechileName());
+        }
+        list.add(alarmModel);
     }
 
     @NonNull

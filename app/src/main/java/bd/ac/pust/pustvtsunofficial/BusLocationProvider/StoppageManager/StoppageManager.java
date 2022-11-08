@@ -10,6 +10,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -17,20 +18,29 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
 
 public class StoppageManager {
     private static StoppageManager stoppageManager;
-    private StoppageManager(){
+    private StoppageManager(StoppageLoadEvent stoppageLoadEvent){
+        sle=stoppageLoadEvent;
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    load();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                while (true) {
+                    try {
+                        load();
+                        break;
+                    } catch (Exception e) {
+                        try {
+                            TimeUnit.MILLISECONDS.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            ex.printStackTrace();
+                        }
+                        e.printStackTrace();
+                    }
                 }
             }
         }).start();
     }
-    public static StoppageManager init(){
-        if(stoppageManager==null) stoppageManager=new StoppageManager();
+    public static synchronized StoppageManager init(StoppageLoadEvent stoppageLoadEvent){
+        if(stoppageManager==null) stoppageManager=new StoppageManager(stoppageLoadEvent);
         return stoppageManager;
     }
     private final Map<String,LatLng> stoppages =new HashMap<>();
