@@ -18,6 +18,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 public class Help extends AppCompatActivity {
     WebView web;
@@ -28,6 +29,7 @@ public class Help extends AppCompatActivity {
     boolean errorOccured = false;
     boolean reloadPressed = false;
     Button retry,goBack;
+    ProgressBar loading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,9 @@ public class Help extends AppCompatActivity {
         errorLayout = findViewById(R.id.cl_error_layout);
         retry = findViewById(R.id.btn_retry);
         goBack = findViewById(R.id.btn_return);
+        loading = findViewById(R.id.pd_loding_page);
+        loading.setVisibility(View.GONE);
+
         mhErrorLayoutHide = new Handler(){
             @Override
             public void handleMessage(@NonNull final Message msg) {
@@ -54,8 +59,11 @@ public class Help extends AppCompatActivity {
         retry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                loading.setVisibility(View.VISIBLE);
+                if(reloadPressed&&errorOccured==false){
+                    hideErrorLayout();
+                }
                 reloadPressed = true;
-                hideErrorLayout();
                 web.reload();
                 errorOccured = false;
             }
@@ -64,9 +72,9 @@ public class Help extends AppCompatActivity {
         goBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Help.this,BusLocatorActivity.class);
+                //Intent intent = new Intent(Help.this,BusLocatorActivity.class);
                 finish();
-                startActivity(intent);
+                //startActivity(intent);
             }
         });
     }
