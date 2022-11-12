@@ -31,6 +31,7 @@ public class Help extends AppCompatActivity {
     boolean errorOccured = false;
     boolean reloadPressed = false;
     Button retry,goBack;
+    ProgressBar loading;
     ProgressBar progressBar;
 
     public Help() throws Exception {
@@ -45,6 +46,8 @@ public class Help extends AppCompatActivity {
         errorLayout = findViewById(R.id.cl_error_layout);
         retry = findViewById(R.id.btn_retry);
         goBack = findViewById(R.id.btn_return);
+        loading = findViewById(R.id.pd_loding_page);
+        loading.setVisibility(View.GONE);
         progressBar=findViewById(R.id.web_progress);
         mhErrorLayoutHide = new Handler(){
             @Override
@@ -65,8 +68,11 @@ public class Help extends AppCompatActivity {
         retry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                loading.setVisibility(View.VISIBLE);
+                if(reloadPressed&&errorOccured==false){
+                    hideErrorLayout();
+                }
                 reloadPressed = true;
-                hideErrorLayout();
                 web.reload();
                 errorOccured = false;
             }
@@ -75,9 +81,9 @@ public class Help extends AppCompatActivity {
         goBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Help.this,BusLocatorActivity.class);
+                //Intent intent = new Intent(Help.this,BusLocatorActivity.class);
                 finish();
-                startActivity(intent);
+                //startActivity(intent);
             }
         });
     }
