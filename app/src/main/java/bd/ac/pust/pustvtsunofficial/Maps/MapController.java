@@ -65,31 +65,33 @@ public class MapController implements OnMapReadyCallback {
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         gmap=googleMap;
-        LocationPermissionChecker locationPermissionChecker=new LocationPermissionChecker(context);
-        if(locationPermissionChecker.checkPermission()){
-            final LocationManager manager = (LocationManager) context.getSystemService( Context.LOCATION_SERVICE );
-            if ( manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-                googleMap.setMyLocationEnabled(true);
-                googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-                googleMap.getUiSettings().setCompassEnabled(true);
-
-                View locationButton = ((View) context.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
-                //locationButton.setVisibility(View.GONE);
-                RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
-                // position on right bottom
-                rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-                rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-                rlp.setMargins(0, 180, 180, 200);
-
-                View compass = ((View) context.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("5"));
-                //locationButton.setVisibility(View.GONE);
-                rlp = (RelativeLayout.LayoutParams) compass.getLayoutParams();
-                // position on right bottom
-                rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-                rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-                rlp.setMargins(0, 180, 180, 200);
-            }
-        }
+        //LocationPermissionChecker locationPermissionChecker=new LocationPermissionChecker(context);
+       // if(locationPermissionChecker.checkPermission()){
+           // final LocationManager manager = (LocationManager) context.getSystemService( Context.LOCATION_SERVICE );
+//            if ( manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+//                googleMap.setMyLocationEnabled(true);
+//                googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+//                googleMap.getUiSettings().setCompassEnabled(true);
+//
+//                View locationButton = ((View) context.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+//                //locationButton.setVisibility(View.GONE);
+//                RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+//                // position on right bottom
+//                rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+//                rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+//                rlp.setMargins(0, 180, 180, 200);
+//
+//                View compass = ((View) context.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("5"));
+//                //locationButton.setVisibility(View.GONE);
+//                rlp = (RelativeLayout.LayoutParams) compass.getLayoutParams();
+//                // position on right bottom
+//                rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+//                rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+//                rlp.setMargins(0, 180, 180, 200);
+//            }
+            googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+            googleMap.getUiSettings().setCompassEnabled(false);
+        //}
 
         notifyStoppageChange();
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {

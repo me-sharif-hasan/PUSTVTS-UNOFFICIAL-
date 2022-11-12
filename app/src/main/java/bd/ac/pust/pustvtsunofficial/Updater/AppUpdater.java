@@ -19,6 +19,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import androidx.core.content.FileProvider;
 import bd.ac.pust.pustvtsunofficial.BuildConfig;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
 
 public class AppUpdater {
     private AppUpdater(){}
@@ -35,7 +36,7 @@ public class AppUpdater {
             @Override
             public void run() {
                 try {
-                    URL u=new URL("https://github.com/me-sharif-hasan/blog-content/raw/main/app_update.json");
+                    URL u=new URL(Utility.BASE_REPO+"app_update.json");
                     HttpsURLConnection httpsURLConnection= (HttpsURLConnection) u.openConnection();
                     byte []buff=new byte[1024];
                     int l=httpsURLConnection.getInputStream().read(buff);

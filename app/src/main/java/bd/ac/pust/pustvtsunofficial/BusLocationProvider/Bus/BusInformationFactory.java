@@ -21,7 +21,7 @@ import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
 public class BusInformationFactory {
     private BusInformationFactory() throws Exception{
             Log.d("II_NETDUMP", "COLLECTING BUS DATA x");
-            URL u = new URL("https://raw.githubusercontent.com/me-sharif-hasan/blog-content/main/BusInfo.json");
+            URL u = new URL(Utility.BASE_REPO+"BusInfo.json");
             HttpsURLConnection httpsURLConnection = (HttpsURLConnection) u.openConnection();
             httpsURLConnection.setRequestMethod("GET");
             httpsURLConnection.setRequestProperty("USER-AGENT", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36");
