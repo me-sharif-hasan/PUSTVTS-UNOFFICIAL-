@@ -138,15 +138,21 @@ public class AlarmActivity extends AppCompatActivity {
     public void start(Integer h, Integer m) {
         AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent myIntent = new Intent(this, AlarmReceiver.class);
-
         Calendar c = Calendar.getInstance();
         c.set(Calendar.HOUR_OF_DAY, h);
         c.set(Calendar.MINUTE, m);
+        long time = c.getTimeInMillis();
+        if (System.currentTimeMillis() > time) {
+            time = time + 24 * 60 * 60 * 1000;
+        }
+        Log.d("II_GET_CRT",c.getTime().toString());
+        myIntent.putExtra("time",c.getTime().toString());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, h*100+m, myIntent, PendingIntent.FLAG_IMMUTABLE);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
+            manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,time, pendingIntent);
         } else {
-            manager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
+            manager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
         }
         try {
             adapter.add(new SimpleDateFormat("hh:mm a").format(c.getTime()),h*100+m);

@@ -10,6 +10,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.PowerManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.concurrent.TimeUnit;
@@ -26,12 +27,13 @@ public class AlarmReceiver extends BroadcastReceiver{
     Ringtone r;
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d("II_TIME","t: "+intent.getStringExtra("time"));
         if(r!=null) r.stop();
         PowerManager powerManager = (PowerManager) context.getSystemService(POWER_SERVICE);
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                 "MyApp::MyWakelockTag");
         wakeLock.acquire();
-        Toast.makeText(context, "BUS engine is on!", Toast.LENGTH_LONG).show();
+        //Toast.makeText(context, "BUS engine is on!", Toast.LENGTH_LONG).show();
         try {
             Intent i=new Intent(context,AlarmReceiver.class);
             i.putExtra("SNOOZE",true);
