@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import javax.net.ssl.HttpsURLConnection;
 
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Utility;
 
 public class StoppageManager {
     private static StoppageManager stoppageManager;
@@ -47,7 +48,7 @@ public class StoppageManager {
     public void load() throws Exception{
         Log.d("II_NETDUMP","COLLECTING BUS DATA");
         String userName= TrackerConfig.getUserAndPass()[0];
-        URL u=new URL("https://raw.githubusercontent.com/me-sharif-hasan/blog-content/main/" +
+        URL u=new URL(Utility.BASE_REPO +
                 "stoppage-"+userName+".txt");
         HttpsURLConnection httpsURLConnection= (HttpsURLConnection) u.openConnection();
         httpsURLConnection.setConnectTimeout(1000);
