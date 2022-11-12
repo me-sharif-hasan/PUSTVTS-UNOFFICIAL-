@@ -53,7 +53,7 @@ public class AlarmActivity extends AppCompatActivity {
         //arrayList.add(new AlarmModel("Bus 9","01:25"));
         //arrayList.add(new AlarmModel("Bus 3","05:10"));
         try {
-            adapter = new AlarmAdapter(AlarmActivity.this,arrayList);
+            adapter = new AlarmAdapter(AlarmActivity.this);
         } catch (Exception e) {
             Log.d("II_ALARM_ADAPTER_ERR",e.getLocalizedMessage());
             e.printStackTrace();
@@ -138,18 +138,18 @@ public class AlarmActivity extends AppCompatActivity {
     public void start(Integer h, Integer m) {
         AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent myIntent = new Intent(this, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, myIntent, PendingIntent.FLAG_IMMUTABLE);
 
         Calendar c = Calendar.getInstance();
         c.set(Calendar.HOUR_OF_DAY, h);
         c.set(Calendar.MINUTE, m);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, h*100+m, myIntent, PendingIntent.FLAG_IMMUTABLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
         } else {
             manager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
         }
         try {
-            adapter.add(new AlarmModel("Alarm #" + (adapter.getItemCount() + 1), new SimpleDateFormat("hh:mm a").format(c.getTime())));
+            adapter.add(new SimpleDateFormat("hh:mm a").format(c.getTime()),h*100+m);
             adapter.notifyDataSetChanged();
         }catch (Exception e){
             e.printStackTrace();

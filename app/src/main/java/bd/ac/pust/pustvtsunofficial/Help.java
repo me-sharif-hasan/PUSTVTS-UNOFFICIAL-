@@ -3,6 +3,7 @@ package bd.ac.pust.pustvtsunofficial;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -18,25 +20,32 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 public class Help extends AppCompatActivity {
     WebView web;
-    private final String url = "https://www.pust.ac.bd/academic/departments/dept_teachers/D01";
+    private final String url = "https://pustvts.github.io/pustvts-info/help-"+ TrackerConfig.getUserAndPass()[0] +".html";
     ConstraintLayout errorLayout;
     Handler mhErrorLayoutHide = null;
 
     boolean errorOccured = false;
     boolean reloadPressed = false;
     Button retry,goBack;
+    ProgressBar progressBar;
+
+    public Help() throws Exception {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("II_HELP",url);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_help);
         web = findViewById(R.id.webView);
         errorLayout = findViewById(R.id.cl_error_layout);
         retry = findViewById(R.id.btn_retry);
         goBack = findViewById(R.id.btn_return);
+        progressBar=findViewById(R.id.web_progress);
         mhErrorLayoutHide = new Handler(){
             @Override
             public void handleMessage(@NonNull final Message msg) {
@@ -47,6 +56,8 @@ public class Help extends AppCompatActivity {
 
         web.setWebViewClient(new MyWebViewClient());
         WebSettings settings = web.getSettings();
+        settings.setDisplayZoomControls(false);
+        settings.setBuiltInZoomControls(true);
         settings.setJavaScriptEnabled(true);
         web.setWebChromeClient(getChromeClient());
         web.loadUrl(url);
@@ -95,6 +106,8 @@ public class Help extends AppCompatActivity {
 
         @Override
         public void onPageStarted(final WebView view, final String url, final Bitmap favicon) {
+            Log.d("II_URI",url);
+            progressBar.setVisibility(View.VISIBLE);
             super.onPageStarted(view, url, favicon);
         }
 
@@ -106,6 +119,7 @@ public class Help extends AppCompatActivity {
         @Override
         public void onPageFinished(final WebView view, final String url) {
             if(errorOccured == false && reloadPressed){
+                progressBar.setVisibility(View.GONE);
                 hideErrorLayout();
                 reloadPressed = false;
             }
@@ -116,6 +130,7 @@ public class Help extends AppCompatActivity {
         public void onReceivedError(final WebView view, final WebResourceRequest request,
                                     final WebResourceError error) {
             errorOccured = true;
+            progressBar.setVisibility(View.GONE);
             showErrorLayout();
             super.onReceivedError(view, request, error);
         }
