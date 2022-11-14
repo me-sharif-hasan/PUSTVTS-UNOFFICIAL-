@@ -2,15 +2,10 @@ package bd.ac.pust.pustvtsunofficial.BusLocationProvider.Bus;
 
 import android.util.Log;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.*;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.Interfaces.BusTrackerInterface;
-import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerConfig;
 import bd.ac.pust.pustvtsunofficial.BusLocationProvider.Adapter.TrackerFactory;
 
 public class Bus implements Comparable{
@@ -173,7 +167,7 @@ public class Bus implements Comparable{
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true&&!aboard) {
+                while (!e.getInturrpt()) {
                     e.setLocationUpdateInterval(Bus.this);
                     try {
                         TimeUnit.MILLISECONDS.sleep(interval);
@@ -191,6 +185,8 @@ public class Bus implements Comparable{
 
     public interface UpdateActionListener{
         void setLocationUpdateInterval(Bus context);
+        void interrupt();
+        boolean getInturrpt();
     }
     public void aboardAllOperation(){
         aboard=true;

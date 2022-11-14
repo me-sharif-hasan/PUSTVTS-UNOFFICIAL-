@@ -47,7 +47,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.viewHold
                 parent,false);
         return new viewHolder(view);
     }
-    Map<Bus,Boolean> updateIntervalAdded=new HashMap<>();
+    Map<String,Bus.UpdateActionListener> updateIntervalAdded=new HashMap<>();
     @Override
     public synchronized void onBindViewHolder(@NonNull viewHolder holder, int position) {
         final Bus bus = list.get(position);
@@ -63,20 +63,35 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.viewHold
         } catch (Exception e) {
             holder.vehicleRoad.setText("প্রযোজ্য নয়");
         }
-        if(!updateIntervalAdded.containsKey(bus)) {
-            updateIntervalAdded.put(bus,true);
 
-            bus.setUpdateInterval(new Bus.UpdateActionListener() {
-                @Override
-                public void setLocationUpdateInterval(Bus context) {
-                    if (context.getEngineStatus()) {
-                        holder.statusColor.setBackgroundColor(Color.GREEN);
-                    } else {
-                        holder.statusColor.setBackgroundColor(Color.RED);
-                    }
+        Bus.UpdateActionListener bua=new Bus.UpdateActionListener() {
+            boolean intr=false;
+            @Override
+            public void setLocationUpdateInterval(Bus context) {
+                if (context.getEngineStatus()) {
+                    holder.statusColor.setBackgroundColor(Color.GREEN);
+                } else {
+                    holder.statusColor.setBackgroundColor(Color.RED);
                 }
-            }, 1000);
+            }
+
+            @Override
+            public void interrupt() {
+                intr=true;
+            }
+
+            @Override
+            public boolean getInturrpt() {
+                return intr;
+            }
+        };
+
+        if(updateIntervalAdded.containsKey(bus.getBusId())){
+            updateIntervalAdded.get(bus.getBusId()).interrupt();
         }
+        updateIntervalAdded.put(bus.getBusId(),bua);
+        bus.setUpdateInterval(bua,1000);
+
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

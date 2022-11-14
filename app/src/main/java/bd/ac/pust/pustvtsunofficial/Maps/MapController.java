@@ -226,6 +226,16 @@ public class MapController implements OnMapReadyCallback {
                             e.printStackTrace();
                         }
                     }
+
+                    @Override
+                    public void interrupt() {
+
+                    }
+
+                    @Override
+                    public boolean getInturrpt() {
+                        return false;
+                    }
                 },1000);
             }
         });
