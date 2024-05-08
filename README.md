@@ -2,8 +2,8 @@
 
 ## Introduction
 The Smart Campus Vehicle Tracking System is a mobile application designed to address the transportation challenges faced by students, faculty, and staff at Pabna University of Science and Technology (PUST). With a significant portion of the university population relying on campus buses for commuting, there have been issues regarding overcrowding and inefficiencies, leading to difficulties in attending classes and examinations.
-
 To mitigate these challenges, we propose the development of a mobile application that will provide real-time tracking of campus buses, ensuring reliable and efficient transportation for students, faculty, and staff. This solution aims to improve accessibility, reduce waiting times, and enhance the overall campus experience.
+[Download](https://github.com/pustvts/pustvts-info)
 ![Screenshot_2024 05 08_01 31 44 958](https://github.com/me-sharif-hasan/PUSTVTS-UNOFFICIAL-/assets/55604433/2206bf60-5acc-44a6-befe-f25122075883)
 
 ## Features
@@ -40,5 +40,5 @@ To implement the Smart Campus Vehicle Tracking System effectively, the following
 ## Conclusion
 The Smart Campus Vehicle Tracking System offers a comprehensive solution to the transportation challenges faced by the Pabna University of Science and Technology community. By leveraging modern technology and efficient management strategies, we aim to create a more accessible, reliable, and convenient transportation system for all stakeholders.
 
-For more information, contact [Project Team](mailto:team@example.com).
+For more information, contact [Project Team](mailto:me.sharif.hasan@gmail.com).
 
