@@ -59,7 +59,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="***REMOVED***" />
+            android:value="**REMOVED**" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="ir.greencode"
